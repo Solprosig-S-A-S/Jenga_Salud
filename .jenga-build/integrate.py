@@ -102,6 +102,13 @@ s=s[:answer_start]+'''window.addEventListener('jenga-answer-state',event=>{
 '''+s[answer_end:]
 s=s.replace("  el('seeAnswer').disabled=false;", "  el('seeAnswer').disabled=!window.JengaSession?.can('reveal');")
 j=Path('.jenga-build/jenga.js').read_text(encoding='utf-8-sig').replace(" $('newChallenge').disabled=!ready||!selected;",'')
+# El área de juego mantiene torre, pregunta y acciones en un único escenario.
+game_start=s.index('  <section id="juego"')
+game_end=s.index('  <section id="gracias"',game_start)
+game=Path('.jenga-build/game.html').read_text(encoding='utf-8').replace('<!-- SESSION -->',Path('.jenga-build/session.html').read_text(encoding='utf-8'))
+s=s[:game_start]+game+'\n'+s[game_end:]
+s=s.replace('</style>',Path('.jenga-build/game.css').read_text(encoding='utf-8')+'\n</style>',1)
+s=s.replace('  window.scrollTo(0,0);',"  window.scrollTo(0,0);\n  window.dispatchEvent(new CustomEvent('experience-page',{detail:{page}}));")
 Path('.jenga-build/jenga.js').write_text(j,encoding='utf-8')
 vendor='\n<!-- Bibliotecas integradas para funcionamiento sin internet. Three.js r160.1 y cannon-es 0.20.0 (MIT). -->\n<script>\n'+Path('.jenga-build/three.min.js').read_text(encoding='utf-8')+'\n</script>\n<script>\nwindow.CANNON=(function(){const exports={};\n'+Path('.jenga-build/cannon.cjs.js').read_text(encoding='utf-8')+'\nreturn exports;})();\n</script>\n'
 vendor='<!--\n'+Path('.jenga-build/three-LICENSE.txt').read_text(encoding='utf-8')+'\n'+Path('.jenga-build/cannon-es-LICENSE.txt').read_text(encoding='utf-8')+'\n-->\n'+vendor
@@ -109,7 +116,7 @@ s=s.replace('<script>\n(function(){',vendor+'<script>\n(function(){',1)
 config_path=Path('.jenga-build/supabase-config.json')
 project_config=json.loads(config_path.read_text(encoding='utf-8')) if config_path.exists() else {}
 config_js='window.JENGA_PROJECT='+json.dumps(project_config,ensure_ascii=True).replace('<','\\u003c')+';\n'
-s=s.replace('</body>','<script>\n'+config_js+Path('.jenga-build/session.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+j+'\n</script>\n</body>')
+s=s.replace('</body>','<script>\n'+config_js+Path('.jenga-build/session.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+j+'\n</script>\n<script>\n'+Path('.jenga-build/game-ui.js').read_text(encoding='utf-8')+'\n</script>\n</body>')
 p.write_text(s,encoding='utf-8')
 Path('index.html').write_text(s,encoding='utf-8')
 print('HTML integrado:',p.stat().st_size,'bytes')

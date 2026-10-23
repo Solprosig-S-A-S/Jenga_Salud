@@ -1,10 +1,10 @@
 <div class="session-card">
   <div class="cap">Partida por turnos</div>
-  <h3 id="turnHeading">Crea una sala o reúne a tu grupo</h3>
+  <div class="session-heading"><h3 id="turnHeading">Crea una sala o reúne a tu grupo</h3><button id="openGameMenu" type="button" class="game-menu-button" aria-label="Opciones y participantes" hidden>☰</button></div>
   <p id="turnMessage" role="status" aria-live="polite">Cada participante responde y confirma su movimiento antes de pasar al siguiente.</p>
   <div id="sessionSetup">
     <label for="roomMode">Cómo van a jugar</label>
-    <select id="roomMode"><option value="online">Cada persona desde su celular · Supabase</option><option value="local">Todos con este dispositivo · sin internet</option></select>
+    <select id="roomMode"><option value="online">Cada quien en su celular</option><option value="local">Compartir este dispositivo</option></select>
     <div id="onlineSetup">
       <details id="connectionSettings" open><summary>Conectar proyecto de Supabase</summary>
         <p class="fine">Pega la URL y la clave pública del proyecto después de ejecutar supabase/jenga.sql en el SQL Editor. Usa publishable o anon; nunca una clave secreta.</p>
@@ -24,7 +24,7 @@
       <button id="startLocal" type="button" class="btn primary">Comenzar partida por turnos</button>
     </div>
   </div>
-  <div id="roomLobby" hidden>
+  <div id="roomLobbyMount"></div><div id="roomLobby" hidden>
     <p id="roomIdentity" class="pill"></p>
     <ol id="playerOrder" aria-label="Orden de participantes"></ol>
     <div class="actions"><button id="startRoom" type="button" class="btn primary">Iniciar con este orden</button><button id="shareRoom" type="button" class="btn outline">Copiar invitación</button><button id="endRoom" type="button" class="btn outline" hidden>La torre real cayó · terminar ronda</button><button id="leaveRoom" type="button" class="btn outline">Salir de este dispositivo</button></div>

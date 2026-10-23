@@ -18,7 +18,7 @@ function options(){const list=$('blockPicker');list.replaceChildren(new Option('
 function select(b){if(!b)return;selected=b;$('blockPicker').value=b.id;
  window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
  $('pieceInstruction').textContent='Saca la pieza #'+b.id;
- $('pieceDetail').textContent='Nivel '+(b.level+1)+' desde la base · posición '+(b.slot+1)+' de 3. Retírala por uno de sus extremos y colócala arriba.';
+ $('pieceDetail').textContent='Nivel '+(b.level+1)+' · posición '+(b.slot+1)+'/3';
  status('Pieza asignada. Responde su pregunta antes de confirmar la retirada.');controls();}
 function choose(b){if(phase!=='ready'||fallen||!session()?.can('draw')||!eligible().includes(b))return;session().act('draw',{blockId:b.id});}
 function canonical(moves){

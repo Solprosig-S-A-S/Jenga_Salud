@@ -23,6 +23,8 @@ El flujo reconstruye el HTML y publica solo `index.html` y `.nojekyll`. El SQL y
 
 Las fuentes están en `.jenga-build`: `base.html`, `jenga.js`, `session.html`, `session.js` y `supabase-config.json`. Después de modificarlas, ejecuta desde la raíz:
 
+La interfaz de juego está en `game.html`, `game.css` y `game-ui.js`. En el celular, la torre, la pregunta y las acciones ocupan una pantalla; el menú reúne los participantes y las instrucciones. La respuesta escrita es opcional y se borra al avanzar de turno; no se envía a Supabase.
+
 ```powershell
 python .jenga-build/package-site.py
 ```
@@ -36,6 +38,7 @@ npm.cmd ci --prefix .jenga-build
 node .jenga-build/check-supabase.cjs
 node .jenga-build/check-local-turns.cjs
 node .jenga-build/check-rooms.cjs
+node .jenga-build/check-mobile.cjs
 ```
 
 Las pruebas de navegador usan Chrome instalado en Windows. Las pruebas de salas interceptan HTTP y ejecutan el SQL en PostgreSQL local mediante PGlite; no modifican el proyecto real de Supabase.

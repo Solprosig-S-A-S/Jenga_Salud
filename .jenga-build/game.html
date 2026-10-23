@@ -1,0 +1,53 @@
+  <section id="juego" class="panel" aria-label="Juego Jenga">
+    <article class="card game-card">
+      <div class="game-intro"><div class="cap">Mi salud, bloque a bloque</div><h2 class="title">Juega con tu grupo</h2></div>
+      <!-- SESSION -->
+      <div id="playArena" class="play-arena" data-step="choose" hidden>
+        <div class="tower-stage">
+          <div class="tower-hud"><span id="blockLabel" class="tower-badge">Tu próximo bloque</span><button id="expandTower" type="button" aria-expanded="false" aria-label="Ampliar torre">⤢</button></div>
+          <div id="towerView" class="tower-view"></div>
+          <div class="tower-controls" aria-label="Controles de la cámara">
+            <button id="rotateLeft" type="button" aria-label="Girar vista a la izquierda">↶</button>
+            <span id="pieceDetail" class="piece-location">Arrastra para girar</span>
+            <button id="rotateRight" type="button" aria-label="Girar vista a la derecha">↷</button>
+            <label class="tower-zoom">Zoom <input id="zoomTower" type="range" min="17" max="34" value="24" aria-label="Distancia de la cámara"></label>
+          </div>
+          <div id="towerStatus" class="tower-status" role="status" aria-live="polite">Preparando la torre…</div>
+        </div>
+        <div id="questionPanel" class="question-panel">
+          <div class="turn-progress" aria-label="Pasos del turno"><span data-turn-step="choose">1 · Elige</span><span data-turn-step="answer">2 · Responde</span><span data-turn-step="move">3 · Mueve</span></div>
+          <div class="question-meta"><span id="challengeType" class="pill">Una pieza, una pregunta</span><span id="pieceInstruction">¿Qué pieza saldrá?</span></div>
+          <h2 id="challengeQuestion" class="challenge-title" aria-live="polite">Sortea una pieza para descubrir tu reto.</h2>
+          <div id="responseArea" class="response-area" hidden><label for="playerResponse">Tu respuesta</label><textarea id="playerResponse" rows="2" maxlength="500" placeholder="Escribe aquí o responde en voz alta…"></textarea></div>
+          <p id="responseEcho" class="response-echo" hidden></p>
+          <div class="reveal" id="challengeAnswer" role="status"></div>
+          <p id="roundEndHint" class="round-end-hint" hidden>La ronda terminó. ¡Buen trabajo, equipo!</p>
+        </div>
+        <div class="arena-actions">
+          <p id="actionHint" class="action-hint" aria-live="polite">Elige una pieza para comenzar.</p>
+          <div class="turn-actions">
+            <button id="drawBlock" type="button" class="btn primary" disabled>🎲 Sortear pieza</button>
+            <details id="manualChoice" class="manual-choice"><summary>Elegir #</summary><div><label for="blockPicker">Pieza del Jenga real</label><select id="blockPicker" disabled><option value="">Seleccionar una pieza…</option></select></div></details>
+            <button id="markAnswered" type="button" class="btn primary" disabled hidden>Ya respondí</button>
+            <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Ya la coloqué · siguiente</button>
+            <button id="seeAnswer" type="button" class="btn light" disabled hidden>Ver guía</button>
+            <button id="openRoundMenu" type="button" class="btn primary" hidden>Opciones de la ronda</button>
+            <span id="waitingTurn" class="waiting-turn" hidden>Espera tu turno</span>
+          </div>
+        </div>
+      </div>
+    </article>
+    <dialog id="gameMenu" class="game-menu" aria-labelledby="gameMenuTitle">
+      <div class="menu-heading"><h2 id="gameMenuTitle">Tu partida</h2><button id="closeGameMenu" type="button" aria-label="Cerrar opciones">✕</button></div>
+      <div id="gameMenuRoom"></div>
+      <div class="game-stats"><span id="towerTurns">0 piezas retiradas</span><span id="challengeCount">0 de 30 preguntas exploradas</span></div>
+      <button id="rebuildTower" type="button" class="btn outline">Reconstruir y abrir nueva ronda</button>
+      <details class="tower-guide"><summary>Cómo jugar con el Jenga real</summary>
+        <ol><li>Numera 54 piezas, de la base hacia arriba, en 18 niveles de tres. Copia el orden de la pantalla.</li><li>En tu turno, sortea o elige una pieza. Responde su pregunta en voz alta o escribe en tu dispositivo.</li><li>Retira esa pieza en la torre real, colócala arriba y confirma para pasar el turno.</li></ol>
+        <p>Las piezas 1–30 usan las 30 preguntas. Las piezas 31–54 repiten las preguntas 1–24. Tu respuesta escrita solo permanece en este dispositivo durante el turno.</p>
+        <p>La torre 3D es una aproximación visual; no predice la caída de la torre real. Si cae, el facilitador cierra la ronda.</p>
+      </details>
+      <details class="tower-guide"><summary>Para el facilitador</summary><p>Relaciona cada pieza con los hábitos de salud. No leas indicadores personales frente al grupo. Los retos pueden responderse verbalmente si una actividad resulta incómoda.</p><p>«La salud, como esta torre, se construye con decisiones cotidianas».</p></details>
+      <div class="actions"><button id="finish" type="button" class="btn primary">Terminar mi experiencia</button><button id="returnResult" type="button" class="btn outline">Mis recomendaciones</button></div>
+    </dialog>
+  </section>
