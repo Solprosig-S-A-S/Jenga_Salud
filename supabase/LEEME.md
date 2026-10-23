@@ -1,6 +1,6 @@
 # Salas de Jenga por turnos
 
-El HTML incluye dos modos: grupo en un dispositivo sin internet y sala compartida mediante Supabase. Ya incluye la URL y la clave pública del proyecto `twemynxvrjlpgmrodopb`. El SQL está instalado: el 23 de octubre de 2026 se verificaron en el proyecto real la creación de sala, la incorporación de otro participante, la respuesta obligatoria y el avance sincronizado de turno. La sala técnica se cerró al terminar. Falta publicar el HTML para compartir un enlace accesible desde otros celulares.
+El HTML incluye dos modos: grupo en un dispositivo sin internet y sala compartida mediante Supabase. Ya incluye la URL y la clave pública del proyecto `twemynxvrjlpgmrodopb`. El SQL está instalado: el 23 de octubre de 2026 se verificaron en el proyecto real la creación de sala, la incorporación de otro participante, la respuesta obligatoria y el avance sincronizado de turno. La sala técnica se cerró al terminar. El juego está publicado en [GitHub Pages](https://solprosig-s-a-s.github.io/Jenga_Salud/) y el código está en [Solprosig-S-A-S/Jenga_Salud](https://github.com/Solprosig-S-A-S/Jenga_Salud).
 
 ## Conectar Supabase
 

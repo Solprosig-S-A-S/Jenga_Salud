@@ -6,7 +6,7 @@ Juego educativo con una torre Jenga 3D, 30 preguntas de autocuidado y partidas p
 
 ## Jugar
 
-Abre `index.html` o la dirección de GitHub Pages una vez publicado. Completa la experiencia inicial y entra a Jenga. Para jugar en grupo desde diferentes celulares, crea una sala, comparte la invitación y espera a que los participantes entren antes de iniciar.
+Abre `index.html` o [el juego en GitHub Pages](https://solprosig-s-a-s.github.io/Jenga_Salud/). Completa la experiencia inicial y entra a Jenga. Para jugar en grupo desde diferentes celulares, crea una sala, comparte la invitación y espera a que los participantes entren antes de iniciar.
 
 La URL y la clave pública del proyecto Supabase ya están integradas. El SQL fue instalado y comprobado en el proyecto real. Los indicadores de salud permanecen en cada dispositivo; las salas comparten alias y movimientos. Consulta [la guía de las salas](supabase/LEEME.md) para el flujo completo.
 
