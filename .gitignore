@@ -1,0 +1,19 @@
+# Dependencias y salidas locales de desarrollo
+node_modules/
+.jenga-build/npm-cache/
+.jenga-build/*.png
+.jenga-build/supabase-probe.json
+.jenga-build/syntax-check.js
+.pages/
+*.bak
+__pycache__/
+*.pyc
+.vscode/
+.env
+.env.*
+!.env.example
+*.log
+
+# Credenciales temporales de pruebas, si se generan en el futuro
+.jenga-build/*-session.json
+.jenga-build/*-token.json

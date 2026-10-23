@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#087c78">
+<meta name="description" content="Mi salud, bloque a bloque: experiencia educativa y preventiva de SOLPROSIG para adultos.">
+<title>Mi salud, bloque a bloque | SOLPROSIG</title>
+<style>
+:root{--ink:#183338;--muted:#586f73;--teal:#087c78;--dark:#07565b;--green:#caf67d;--line:#dbeae7;--bg:#f3f8f7;--shadow:0 14px 45px #0d4c4b10;--amber:#f5ae36;--red:#bf4c43}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,'Segoe UI',Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.6}.wrap{max-width:950px;margin:auto;padding:0 16px 38px}.hero{padding:27px 28px 30px;margin:0 -16px;background:radial-gradient(ellipse at 94% 12%,#21a097 0%,#087c78 35%,#063c50 92%);color:white;border-radius:0 0 30px 30px;position:relative;overflow:hidden}.hero:after{content:'▥';font-size:195px;position:absolute;right:0;top:-36px;opacity:.09;transform:rotate(-22deg);pointer-events:none}.brand{font-weight:950;letter-spacing:.14em;font-size:12px;color:#d1ffac}.hero h1{line-height:1.06;font-size:clamp(32px,6vw,49px);letter-spacing:-.04em;max-width:610px;margin:14px 0 10px}.hero h1 em{font-style:normal;color:var(--green)}.hero p{max-width:610px;font-size:15px;color:#e1fcf7;margin:0}.kicker{display:inline-block;border:1px solid #dcfff170;border-radius:100px;padding:5px 13px;font-size:12px;letter-spacing:.02em;font-weight:800;margin-top:17px}.steps{display:flex;gap:7px;margin:17px 0 14px}.step{flex:1;min-width:0;text-align:center;border-radius:12px;background:#fff;border:1px solid var(--line);color:#526e72;padding:10px 3px;font-size:12px;font-weight:800}.step.active{color:#fff;background:var(--dark);border-color:var(--dark)}.step.done{color:#105950;background:#e3f8e5}.panel{display:none}.panel.active{display:block}.card{border:1px solid var(--line);background:#fff;border-radius:22px;padding:24px;box-shadow:var(--shadow);margin:12px 0}.cap{color:var(--teal);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:950}.title{margin:8px 0 12px;font-size:clamp(22px,3vw,28px);letter-spacing:-.03em;color:#063e4b;line-height:1.14}.copy{margin:8px 0 16px;color:#476268}.callout{border:1px solid #bce2d8;background:#ebf9f4;padding:16px 17px;border-radius:14px;margin:17px 0}.callout strong{color:#074d4b}.callout.amber{border-color:#f0d49a;background:#fff8e8}.callout.danger{border-color:#f1b3a8;background:#fff0ec}.note{font-size:13px;color:var(--muted)}.fine{font-size:12px;color:var(--muted)}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px}.btn{appearance:none;border:none;border-radius:12px;padding:13px 19px;font-weight:900;min-height:48px}.btn.primary{background:var(--teal);color:white}.btn.light{background:#e7f3ee;color:var(--dark)}.btn.outline{background:#fff;color:var(--dark);border:1.5px solid #bed8d0}.btn:hover{filter:brightness(.97)}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8fdfcb;outline-offset:2px}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-top:18px}.field label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}.field input,.field select{width:100%;min-width:0;min-height:50px;padding:12px 12px;border-radius:12px;border:1.5px solid #b9d4d2;background:#fff;color:#173940}.field small{display:block;font-size:12px;color:#5b7578;margin-top:5px}.field .required{color:#a63f30}.rule{border:none;border-top:1px solid #e2eeeb;margin:22px 0}.error{display:none;background:#fff0ec;border:1px solid #eaa99d;border-radius:12px;color:#872a22;padding:13px 14px;font-weight:700;line-height:1.4}.error.show{display:block}.pill{display:inline-flex;padding:5px 11px;border-radius:99px;background:#e9f6ec;color:#186653;font-size:12px;font-weight:900}.gauge{display:grid;grid-template-columns:130px minmax(0,1fr);gap:16px;align-items:center}.grade{width:122px;height:122px;border-radius:26px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:64px;line-height:1;font-weight:1000;background:#ecf9e8;color:#22774a}.grade span{font-size:11px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:3px}.gauge.level-b .grade{background:#fff1d3;color:#915c05}.gauge.level-c .grade{background:#fee4e0;color:#a63d34}.gauge.level-d .grade{background:#9f2625;color:#fff}.levelhead{font-size:clamp(21px,3.5vw,29px);color:#073e46;line-height:1.17;font-weight:950;letter-spacing:-.03em;margin:5px 0 8px}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:17px 0}.metric{border:1px solid #dce9e7;background:#f5fbf8;padding:16px;border-radius:15px;min-height:131px}.metric span{font-size:12px;color:#557075;font-weight:850;display:block}.metric strong{font-size:27px;color:#09575c;display:block;line-height:1.3;margin:6px 0}.metric small{font-size:12px;color:#567074}.recs{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}.recs li{border:1px solid #ddebe7;border-radius:13px;padding:13px 14px;background:#f7fbf9}.recs li:before{content:'✓';font-weight:1000;color:var(--teal);margin-right:8px}.things{margin:8px 0;padding-left:22px;color:#426168}.things li{margin-bottom:6px}.wood{background:linear-gradient(135deg,#fdf7e9,#fff);border-color:#ebd3b5}.wood-block{background:linear-gradient(155deg,#e8ae67,#cf8740);border:2px solid #ad7237;border-radius:12px;min-height:98px;width:min(320px,92%);box-shadow:8px 8px 0 #ad773f,11px 16px 23px #ad773f27;margin:15px auto 24px;display:grid;place-items:center;color:#653b14;font-size:20px;font-weight:1000;text-align:center;transform:rotate(-2deg);padding:15px}.challenge-title{font-size:clamp(22px,3.7vw,29px);line-height:1.24;color:#17474c;font-weight:950;margin:13px 0 18px}.reveal{display:none;padding:16px;background:#e9f9ef;border:1px solid #bbdfc9;border-radius:14px;margin:12px 0;color:#25593d}.reveal.visible{display:block}.counter{font-size:13px;color:#5a716d;font-weight:800}.thanks{text-align:center;padding:20px 0}.heart{font-size:64px;line-height:1.2}.thanks h2{font-size:32px;color:var(--dark);line-height:1.13}.footer{text-align:center;font-size:12px;color:#5d7778;padding:17px 5px 3px}.footer a{color:#296b6e}.tiny-icon{font-size:22px}.center-note{text-align:center;padding:10px}.print-only{display:none}
+@media(max-width:630px){.wrap{padding:0 12px 25px}.hero{margin:0 -12px;padding:23px 19px 24px;border-radius:0 0 26px 26px}.card{padding:20px 16px;border-radius:18px}.field-grid{grid-template-columns:1fr;gap:14px}.metric-grid{grid-template-columns:1fr 1fr;gap:9px}.metric{padding:13px;min-height:115px}.metric strong{font-size:24px}.gauge{grid-template-columns:90px minmax(0,1fr);gap:12px}.grade{width:88px;height:88px;border-radius:18px;font-size:43px}.grade span{font-size:9px}.step{font-size:10.8px;padding:10px 2px}.btn{width:100%;justify-content:center}.actions{display:grid}.hero h1{font-size:36px}}@media(max-width:370px){.gauge{grid-template-columns:1fr}.grade{width:88px;height:88px}.steps{gap:3px}.step{font-size:10px}.metric-grid{grid-template-columns:1fr}}@media print{body{background:#fff}.wrap{max-width:none}.hero{color:#000;background:#fff;padding:0;border-radius:0}.hero h1 em{color:#000}.hero p{color:#000}.steps,.actions,.no-print,.wood,.footer{display:none!important}.panel{display:none!important}#resultado.panel{display:block!important}.card{border:1px solid #ccc;box-shadow:none;break-inside:avoid}.print-only{display:block}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="brand">SOLPROSIG S.A.S. · PROMOCIÓN Y PREVENCIÓN</div>
+    <h1>Mi salud, <em>bloque a bloque</em> 🧱</h1>
+    <p>Una experiencia de autocuidado para aprender, reflexionar y jugar con el Jenga gigante.</p>
+    <span class="kicker">Tu bienestar se construye con pequeñas decisiones</span>
+  </header>
+  <nav class="steps" aria-label="Avance de la experiencia">
+    <span id="step-intro" class="step active">1. Bienvenida</span>
+    <span id="step-datos" class="step">2. Mis datos</span>
+    <span id="step-resultado" class="step">3. Orientación</span>
+    <span id="step-juego" class="step">4. Jenga</span>
+  </nav>
+
+  <main>
+  <section id="intro" class="panel active" aria-label="Bienvenida">
+    <article class="card">
+      <div class="cap">Antes de comenzar</div>
+      <h2 class="title">Un punto de partida para cuidar tu salud 💚</h2>
+      <p class="copy">Esta experiencia es una <strong>simulación educativa</strong>. No establece un diagnóstico ni calcula tu riesgo cardiovascular real, y <strong>no reemplaza una consulta ni las indicaciones de profesionales de la salud</strong>.</p>
+      <div class="callout"><strong>Responde con honestidad.</strong> Si registras medidas reales y contestas sinceramente, las orientaciones pueden ayudarte a identificar hábitos por fortalecer y preguntas para conversar con tu profesional de salud.</div>
+      <ul class="things">
+        <li>Está diseñada para <strong>personas adultas</strong> y tarda pocos minutos.</li>
+        <li>Registrarás peso y estatura; otros indicadores y hábitos son opcionales.</li>
+        <li>Recibirás un <strong>nivel orientativo A, B o C</strong> y consejos preventivos. Las letras <strong>no son categorías médicas</strong>.</li>
+        <li><strong>Privacidad:</strong> no solicitamos nombres, cédulas ni contactos. Esta versión no guarda ni envía información; los datos se borran al cerrar o recargar la página.</li>
+      </ul>
+      <div class="actions"><button type="button" id="begin" class="btn primary">Soy mayor de edad · Comenzar →</button></div>
+      <p class="fine">Participar es voluntario. No muestres tus resultados a otras personas si no deseas hacerlo. La empresa y la ARL no reciben los datos ingresados.</p>
+    </article>
+  </section>
+
+  <section id="datos" class="panel" aria-label="Registro de datos">
+    <article class="card">
+      <div class="cap">Paso 2 · Conozcámonos</div>
+      <h2 class="title">Tus indicadores y hábitos</h2>
+      <p class="copy">Ingresa el peso y la estatura. Puedes usar coma o punto para decimales (por ejemplo, 72,5).</p>
+      <form id="healthForm" novalidate>
+        <div class="field-grid">
+          <div class="field"><label for="peso">Peso en kilogramos <span class="required">*</span></label><input id="peso" name="peso" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 72,5" required><small>Dato de una medición reciente, si la conoces.</small></div>
+          <div class="field"><label for="talla">Estatura en centímetros <span class="required">*</span></label><input id="talla" name="talla" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 165" required><small>Si mides 1,65 m, escribe 165.</small></div>
+          <div class="field"><label for="cintura">Perímetro abdominal (cm) · opcional</label><input id="cintura" name="cintura" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 86"><small>Se muestra como dato informativo, sin establecer riesgo a partir de esta medida.</small></div>
+          <div class="field"><label for="sis">Presión sistólica · opcional</label><input id="sis" name="sis" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej. 120"><small>Primer número de la presión arterial, en mmHg.</small></div>
+          <div class="field"><label for="dia">Presión diastólica · opcional</label><input id="dia" name="dia" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej. 80"><small>Segundo número de la presión arterial, en mmHg. Registra una medición real.</small></div>
+        </div>
+        <hr class="rule">
+        <div class="cap">Tus hábitos · Respuestas voluntarias</div>
+        <div class="field-grid">
+          <div class="field"><label for="actividad">Actividad física semanal</label><select id="actividad"><option value="">Prefiero no responder</option><option value="suficiente">Al menos 150 minutos moderados</option><option value="poca">Menos de 150 minutos moderados</option><option value="nada">Casi no realizo actividad física</option></select></div>
+          <div class="field"><label for="comida">Frutas y verduras</label><select id="comida"><option value="">Prefiero no responder</option><option value="habitual">La mayoría de los días</option><option value="poca">Pocas veces</option></select></div>
+          <div class="field"><label for="azucar">Bebidas azucaradas</label><select id="azucar"><option value="">Prefiero no responder</option><option value="baja">Rara vez o nunca</option><option value="frecuente">Con frecuencia</option></select></div>
+          <div class="field"><label for="alcohol">Consumo de alcohol</label><select id="alcohol"><option value="">Prefiero no responder</option><option value="nunca">No consumo</option><option value="ocasional">Ocasionalmente</option><option value="frecuente">Frecuentemente o en exceso</option></select></div>
+          <div class="field"><label for="descanso">Descanso nocturno</label><select id="descanso"><option value="">Prefiero no responder</option><option value="bien">Habitualmente 7 a 9 horas</option><option value="poco">Generalmente menos de 7 horas</option></select></div>
+          <div class="field"><label for="control">¿Te indicaron seguimiento médico de presión, glucosa o colesterol?</label><select id="control"><option value="">Prefiero no responder</option><option value="no">No / no que yo sepa</option><option value="si">Sí, me recomendaron controles</option></select></div>
+        </div>
+        <div id="formError" class="error" role="alert" tabindex="-1" aria-live="assertive" style="margin-top:20px"></div>
+        <div class="actions"><button id="submitHealth" class="btn primary" type="submit">✨ Ver mi nivel y recomendaciones →</button><button id="backIntro" class="btn outline" type="button">← Volver</button></div>
+      </form>
+      <p class="fine">No ingreses datos inventados para llenar las casillas opcionales. Una cifra aislada no confirma ni descarta una enfermedad.</p>
+    </article>
+  </section>
+
+  <section id="resultado" class="panel" aria-label="Resultados educativos">
+    <article class="card">
+      <div class="cap">Paso 3 · Tu orientación preventiva</div>
+      <h2 class="title">¡Conoce tu punto de partida!</h2>
+      <div id="gauge" class="gauge level-a">
+        <div class="grade"><span>Nivel</span><b id="letter">A</b></div>
+        <div><div id="levelHeading" class="levelhead">Vas por buen camino</div><p id="levelText" class="copy" style="margin:0">Recomendaciones a partir de lo registrado.</p></div>
+      </div>
+      <div id="alertBox" aria-live="polite"></div>
+      <div class="callout amber"><strong>Importante:</strong> los niveles A, B y C son <strong>etiquetas educativas creadas para este juego</strong>, no diagnósticos ni una escala clínica validada. Un nivel A no significa estar libre de riesgo ni reemplaza tus controles médicos.</div>
+      <div class="metric-grid" aria-label="Indicadores calculados">
+        <div class="metric"><span>Tu IMC estimado</span><strong id="bmiOut">—</strong><small id="bmiLabel">—</small></div>
+        <div class="metric"><span>Presión registrada</span><strong id="pressureOut">—</strong><small>mmHg · medición puntual</small></div>
+        <div class="metric"><span>Perímetro abdominal</span><strong id="waistOut">—</strong><small>Sin interpretación aislada</small></div>
+      </div>
+      <p id="contextNote" class="note"></p>
+    </article>
+    <article class="card">
+      <div class="cap">Pequeños cambios, grandes oportunidades</div>
+      <h2 class="title">Tus recomendaciones</h2>
+      <ul id="recommendations" class="recs"></ul>
+      <div class="callout"><strong>Tu salud es primero.</strong> Si tienes síntomas de alarma, consulta de inmediato al servicio de urgencias. Para interpretar las medidas, busca orientación de profesionales de salud en tu EPS o prestador.</div>
+      <div class="actions"><button id="goJenga" type="button" class="btn primary">🧱 Continuar al Jenga gigante →</button><button id="editData" type="button" class="btn outline">← Corregir mis datos</button><button id="resetFromResults" type="button" class="btn light">Borrar y comenzar de nuevo</button></div>
+    </article>
+  </section>
+
+  <section id="juego" class="panel" aria-label="Juego Jenga">
+    <article class="card wood">
+      <div class="cap">Paso 4 · ¡A jugar!</div>
+      <h2 class="title">Un bloque, una decisión</h2>
+      <p class="copy">Retira una pieza del Jenga gigante y pulsa <strong>Nuevo reto</strong>. Responde y descubre la orientación del facilitador.</p>
+      <div class="wood-block" id="blockLabel">¡TU RETO TE ESPERA!</div>
+      <div class="pill" id="challengeType">Sorpresa preventiva</div>
+      <p class="challenge-title" id="challengeQuestion">¿Podrás retirar un bloque sin tumbar la torre?</p>
+      <div class="reveal" id="challengeAnswer" role="status"></div>
+      <div class="counter" id="challengeCount">0 de 30 retos explorados</div>
+      <div class="actions"><button id="newChallenge" type="button" class="btn primary">🎲 Nuevo reto</button><button id="seeAnswer" type="button" class="btn light">👀 Ver respuesta</button></div>
+      <p class="note">Los retos no requieren revelar indicadores personales. Si alguna actividad física es incómoda, cambia por una respuesta verbal.</p>
+    </article>
+    <article class="card">
+      <h2 class="title">Para el facilitador</h2>
+      <p class="copy">Conecta la estabilidad de la torre con los hábitos que cuidan nuestra salud: movimiento, alimentación, descanso, prevención del consumo nocivo de alcohol y controles de salud. Evita leer resultados de participantes frente al grupo.</p>
+      <div class="callout">💬 <strong>Mensaje clave:</strong> “La salud, como esta torre, se construye con decisiones cotidianas. Siempre estamos a tiempo de fortalecer algún bloque”.</div>
+      <div class="actions"><button id="finish" type="button" class="btn primary">💚 Terminar mi experiencia</button><button id="returnResult" type="button" class="btn outline">← Ver mis recomendaciones</button></div>
+    </article>
+  </section>
+
+  <section id="gracias" class="panel" aria-label="Mensaje de cierre">
+    <article class="card thanks">
+      <div class="heart">💚</div>
+      <div class="cap">Solprosig S.A.S.</div>
+      <h2>¡Gracias por cuidar de ti!</h2>
+      <p class="copy" style="max-width:640px;margin:auto">Gracias por participar, reflexionar y compartir. Esperamos que esta experiencia sea un punto de partida para tomar decisiones que protejan tu bienestar y fortalecer los hábitos que te acompañan en el trabajo y en casa.</p>
+      <div class="callout" style="max-width:580px;margin:22px auto"><strong>Recuerda:</strong> tu salud es primero. Ningún juego ni simulación reemplaza los consejos o la valoración de un profesional de salud.</div>
+      <p style="font-weight:950;color:#09665c">Con aprecio, el equipo de SOLPROSIG S.A.S.</p>
+      <div class="actions" style="justify-content:center"><button id="restart" type="button" class="btn primary">Comenzar con otro participante</button></div>
+      <p class="fine">Al comenzar de nuevo, se eliminan de la pantalla los datos y el resultado anterior.</p>
+    </article>
+  </section>
+  </main>
+  <footer class="footer">SOLPROSIG S.A.S. · Sensibilización para la promoción y prevención en el trabajo · Versión 2.0<br>
+    Referencias generales: <a href="https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html" target="_blank" rel="noopener">CDC (IMC)</a> · <a href="https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings" target="_blank" rel="noopener">AHA (presión arterial)</a> · <a href="https://www.minsalud.gov.co/salud/publica/HS/Paginas/actividad-fisica.aspx" target="_blank" rel="noopener">MinSalud (actividad física)</a>.<br>
+    Los enlaces a referencias requieren conexión; esta aplicación funciona sin internet.</footer>
+</div>
+<script>
+(function(){
+'use strict';
+const el=(id)=>document.getElementById(id);
+const pages=['intro','datos','resultado','juego','gracias'];
+function showPage(page){
+  pages.forEach(p=>el(p).classList.toggle('active',p===page));
+  ['intro','datos','resultado','juego'].forEach((p,index)=>{
+     const step=el('step-'+p);step.classList.toggle('active',p===page||(page==='gracias'&&p==='juego'));
+     step.classList.toggle('done',page==='gracias'||(pages.indexOf(page)>index));
+  });
+  window.scrollTo(0,0);
+}
+function strNumber(id){const s=el(id).value.trim().replace(/\s/g,'').replace(',','.');if(!s)return null;if(!/^\d+(\.\d+)?$/.test(s))return NaN;return Number(s)}
+function validRange(n,min,max){return Number.isFinite(n)&&n>=min&&n<=max}
+function setError(message,id){const box=el('formError');box.textContent=message;box.classList.add('show');if(id)el(id).focus();else box.focus();box.scrollIntoView({block:'center'});}
+function noError(){el('formError').classList.remove('show');el('formError').textContent=''}
+function one(n){return n.toLocaleString('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1})}
+function appendRec(list,msg){if(!list.includes(msg))list.push(msg)}
+function evaluate(){
+  noError();const weight=strNumber('peso'),height=strNumber('talla'),waist=strNumber('cintura'),sys=strNumber('sis'),dia=strNumber('dia');
+  if(!validRange(weight,25,350))return setError('Revisa el peso: ingresa un número de 25 a 350 kg. Puedes escribir decimales con coma o punto.','peso');
+  if(!validRange(height,100,250))return setError('Revisa la estatura: ingresa un número de 100 a 250 centímetros. Ejemplo: 165.','talla');
+  if(waist!==null&&!validRange(waist,40,210))return setError('Revisa el perímetro abdominal (40 a 210 cm) o déjalo vacío.','cintura');
+  if((sys===null)!==(dia===null))return setError('Para registrar presión arterial debes escribir ambos números; de lo contrario, deja ambos espacios vacíos.',sys===null?'sis':'dia');
+  if(sys!==null&&(!Number.isInteger(sys)||!Number.isInteger(dia)||!validRange(sys,60,260)||!validRange(dia,35,160)||sys<=dia))return setError('Revisa la presión: registra valores reales como 120 y 80 (mmHg), con el número sistólico mayor al diastólico.','sis');
+  const bmi=weight/Math.pow(height/100,2);
+  const life={activity:el('actividad').value,food:el('comida').value,soda:el('azucar').value,alcohol:el('alcohol').value,sleep:el('descanso').value,follow:el('control').value};
+  const flags=[life.activity==='poca'||life.activity==='nada',life.food==='poca',life.soda==='frecuente',life.alcohol==='frecuente',life.sleep==='poco'].filter(Boolean).length;
+  const notes=[],recs=[];
+  let rank=0;
+  // These letters are custom educational prompts, NOT validated medical-risk scores.
+  if(bmi<18.5){rank=Math.max(rank,1);notes.push('IMC por debajo del rango de referencia para adultos');}
+  else if(bmi>=30){rank=Math.max(rank,2);notes.push('IMC de 30 o más: conviene valoración profesional');}
+  else if(bmi>=25){rank=Math.max(rank,1);notes.push('IMC de 25 a menos de 30: oportunidad de seguimiento');}
+  if(flags>=3){rank=Math.max(rank,2);notes.push('Varios hábitos que podrías fortalecer');}
+  else if(flags>=1){rank=Math.max(rank,1);notes.push('Algunos hábitos que podrías fortalecer');}
+  if(life.follow==='si'){rank=Math.max(rank,2);notes.push('Te recomendaron seguimiento médico de indicadores');}
+  let urgent=false;
+  if(sys!==null){
+    if(sys>=180||dia>=120){rank=3;urgent=true;notes.push('Lectura muy alta de presión arterial que requiere atención prioritaria');}
+    else if(sys>=140||dia>=90){rank=Math.max(rank,2);notes.push('Presión arterial registrada de 140/90 mmHg o mayor');}
+    else if(sys>=130||dia>=80){rank=Math.max(rank,1);notes.push('Presión arterial registrada por encima del rango habitual');}
+    else if(sys<90||dia<60){rank=Math.max(rank,1);notes.push('Presión arterial registrada baja');}
+  }
+  const levels=[
+   {letter:'A',className:'level-a',title:'¡Vas por buen camino!',txt:'Con los datos que compartiste no surgieron alertas en esta simulación. Sigue cuidándote y mantén tus controles preventivos.'},
+   {letter:'B',className:'level-b',title:'¡Estás a tiempo de fortalecer tus hábitos!',txt:'Identificaste oportunidades de mejora. Comienza con cambios pequeños y solicita orientación cuando lo necesites.'},
+   {letter:'C',className:'level-c',title:'Tu salud merece mayor atención',txt:'Lo que registraste sugiere que sería importante programar una valoración con profesionales de salud. No significa que tengas una enfermedad.'},
+   {letter:'C+',className:'level-d',title:'Atiende esta señal pronto',txt:'Registraste una presión arterial muy alta. Este aviso no es un diagnóstico, pero debes repetir la toma en reposo y buscar orientación médica inmediata si persiste.'}
+  ];
+  const level=levels[rank],gauge=el('gauge');gauge.className='gauge '+level.className;
+  el('letter').textContent=level.letter;el('levelHeading').textContent=level.title;el('levelText').textContent=level.txt;
+  el('bmiOut').textContent=one(bmi);
+  el('bmiLabel').textContent=bmi<18.5?'Por debajo del rango de referencia':bmi<25?'En el rango de referencia':bmi<30?'Por encima del rango de referencia':'IMC igual o superior a 30';
+  el('pressureOut').textContent=sys===null?'Sin dato':sys+'/'+dia;
+  el('waistOut').textContent=waist===null?'Sin dato':one(waist)+' cm';
+  const alertBox=el('alertBox');alertBox.replaceChildren();
+  if(urgent){const item=document.createElement('div');item.className='callout danger';item.innerHTML='<strong>⚠️ Lectura muy alta:</strong> espera al menos 1 minuto en reposo y mide de nuevo. Si sigue muy alta, contacta de inmediato a un profesional de salud. Si presentas dolor de pecho, falta de aire, debilidad, cambios de visión o dificultad para hablar, busca atención de urgencias de inmediato. No realices retos físicos hasta ser evaluado.';alertBox.append(item);}
+  else if(sys!==null&&(sys>=140||dia>=90)){const item=document.createElement('div');item.className='callout amber';item.textContent='⚠️ Una sola lectura alta no confirma hipertensión. Repite la medición con técnica adecuada y solicita una valoración de salud.';alertBox.append(item);}
+  else if(sys!==null&&(sys<90||dia<60)){const item=document.createElement('div');item.className='callout amber';item.textContent='⚠️ Esta presión puede ser baja. Si tienes mareo, desmayo o debilidad, busca orientación médica. Las cifras aisladas no explican la causa.';alertBox.append(item);}
+  if(bmi<18.5)appendRec(recs,'Habla con un profesional de salud sobre el peso bajo y el contexto de tu alimentación. No intentes subir o bajar peso sin asesoría individual.');
+  else if(bmi>=25)appendRec(recs,'Tu IMC es un dato de tamizaje, no un diagnóstico. Solicita orientación para interpretarlo junto con otros indicadores y tu historia de salud.');
+  else appendRec(recs,'Tu IMC está en el rango de referencia para adultos; continúa con controles preventivos porque este indicador no muestra toda tu salud.');
+  if(sys===null)appendRec(recs,'Conocer tu presión arterial mediante una medición real puede complementar esta orientación.');
+  else if(urgent)appendRec(recs,'Prioriza la repetición de la presión en reposo y la atención de salud indicada en la alerta; evita realizar ejercicio intenso por ahora.');
+  else if(sys>=130||dia>=80)appendRec(recs,'Realiza seguimiento de tu presión arterial y consulta a un profesional de salud; una sola lectura no permite confirmar hipertensión.');
+  else appendRec(recs,'Mantén controles periódicos de presión arterial, especialmente si cuentas con factores de riesgo o antecedentes relevantes.');
+  if(waist!==null)appendRec(recs,'Guarda mentalmente tu perímetro abdominal como dato de seguimiento; un profesional puede interpretarlo según tus características y otros indicadores.');
+  if(life.activity==='poca'||life.activity==='nada')appendRec(recs,'Busca oportunidades para moverte gradualmente: caminar, bailar o realizar pausas de movilidad; la meta general es 150 minutos semanales de actividad moderada, según tus capacidades.');
+  else if(life.activity==='suficiente')appendRec(recs,'¡Bien por incluir movimiento! Sostén tus rutinas y adapta su intensidad a tus necesidades.');
+  if(life.food==='poca')appendRec(recs,'Intenta incluir más frutas, verduras y alimentos variados durante la semana.');
+  if(life.soda==='frecuente')appendRec(recs,'Cambia algunas bebidas azucaradas por agua potable. Los cambios progresivos también cuentan.');
+  if(life.alcohol==='frecuente')appendRec(recs,'Evitar o reducir el alcohol ayuda al cuidado de tu salud. No consumas alcohol antes o durante la jornada de trabajo ni al conducir.');
+  else if(life.alcohol==='ocasional')appendRec(recs,'Recuerda que menos alcohol es mejor para la salud. Evita consumirlo antes de trabajar o conducir.');
+  if(life.sleep==='poco')appendRec(recs,'Organiza una rutina de descanso. Muchos adultos necesitan dormir entre 7 y 9 horas habitualmente.');
+  if(life.follow==='si')appendRec(recs,'Respeta los controles previamente indicados por tu profesional tratante, incluso si hoy te sientes bien.');
+  appendRec(recs,'Lleva tus preguntas a una consulta con profesionales de salud de tu EPS o prestador y fortalece tu autocuidado sin compararte con tus compañeros.');
+  const list=el('recommendations');list.replaceChildren();recs.forEach(r=>{const li=document.createElement('li');li.textContent=r;list.append(li)});
+  let note='Interpretación orientativa para adultos. El IMC no mide directamente grasa corporal y puede no ser apropiado durante el embarazo u otras situaciones clínicas.';
+  if(sys===null)note+=' No registraste presión arterial; este resultado es parcial y no descarta hipertensión ni otros problemas de salud.';
+  if(notes.length)note+=' Esta orientación consideró: '+notes.join('; ')+'.';
+  el('contextNote').textContent=note;
+  showPage('resultado');
+}
+
+const challenges=[
+ ['Verdadero o falso','La presión arterial elevada siempre produce síntomas.','Falso. Puede no presentar síntomas; por eso es importante medirla.','PRESIÓN'],
+ ['Completa','El IMC relaciona el peso con la ______.','Estatura al cuadrado (en metros).','INDICADORES'],
+ ['Pregunta','¿Qué significan las letras IMC?','Índice de masa corporal.','INDICADORES'],
+ ['Verdadero o falso','El exceso de alcohol puede elevar la presión arterial.','Verdadero. Reducir o evitar su consumo es una medida protectora.','ALCOHOL'],
+ ['Reto grupal','Nombren tres formas de moverse durante la jornada laboral.','Caminar, hacer pausas de movilidad y usar escaleras si resulta seguro.','MOVIMIENTO'],
+ ['Pregunta','¿Por qué es útil conocer el perímetro abdominal?','Es un indicador complementario que debe interpretarse junto con otros datos.','CINTURA'],
+ ['Completa','El número de arriba en la presión arterial se llama ______.','Presión sistólica.','PRESIÓN'],
+ ['Completa','El número de abajo en la presión arterial se llama ______.','Presión diastólica.','PRESIÓN'],
+ ['Mito o realidad','Un IMC habitual significa que ya no necesito controles de salud.','Mito. El IMC no evalúa por sí solo la salud cardiovascular.','INDICADORES'],
+ ['Reto creativo','Inventa un lema que incluya la palabra “corazón”.','Respuesta libre: que anime al autocuidado sin juzgar a otras personas.','CREATIVIDAD'],
+ ['Reto grupal','Digan cuatro alimentos que aporten fibra.','Avena, lentejas, fríjoles, frutas y verduras, entre otros.','ALIMENTACIÓN'],
+ ['Pregunta','¿Cuántos minutos semanales de actividad moderada se recomiendan para adultos?','Al menos 150 minutos a la semana, adaptados a la capacidad personal.','MOVIMIENTO'],
+ ['Verdadero o falso','Estar sentado muchas horas sin pausas no importa si hago ejercicio un día a la semana.','Falso. Conviene reducir el tiempo sedentario y moverse a lo largo del día.','MOVIMIENTO'],
+ ['Reto de mímica','Representa sin palabras una pausa activa que harías en la oficina.','El grupo adivina; evita esfuerzos que generen dolor.','MOVIMIENTO'],
+ ['Pregunta','¿Qué bebida conviene elegir con mayor frecuencia para hidratarnos?','Agua potable.','ALIMENTACIÓN'],
+ ['Mito o realidad','El sueño también hace parte del cuidado cardiovascular.','Realidad. Un descanso regular es un hábito protector.','DESCANSO'],
+ ['Verdadero o falso','Puedo saber si tengo hipertensión solo con mi peso.','Falso. Se necesita medir la presión y una evaluación profesional.','PRESIÓN'],
+ ['Reto grupal','Mencionen tres alternativas para compartir sin tomar alcohol.','Bebidas sin alcohol, baile, concursos, juegos y actividades deportivas adaptadas.','ALCOHOL'],
+ ['Completa','Una forma de disminuir azúcar en bebidas es elegir más ______.','Agua.','ALIMENTACIÓN'],
+ ['Pregunta','¿Qué harías si tienes una presión muy alta en una medición?','Repetir después de al menos un minuto en reposo y buscar consejo profesional inmediato si persiste; con signos de alarma, urgencias.','PRESIÓN'],
+ ['Mito o realidad','Caminar, bailar o montar bicicleta pueden contar como actividad física.','Realidad, según su duración e intensidad.','MOVIMIENTO'],
+ ['Reto creativo','Inventa una frase corta para motivar a beber más agua.','Respuesta libre.','CREATIVIDAD'],
+ ['Pregunta','¿Por qué una sola medición de presión no confirma hipertensión?','Porque la presión cambia por diferentes causas y requiere evaluación con mediciones apropiadas.','PRESIÓN'],
+ ['Reto grupal','Propongan tres hábitos que apoyen la salud metabólica.','Moverse, alimentarse variadamente, descansar, evitar tabaco y acudir a controles.','AUTOCUIDADO'],
+ ['Verdadero o falso','Fumar solo ocasionalmente no afecta la salud del corazón.','Falso. El tabaco aumenta el riesgo cardiovascular.','AUTOCUIDADO'],
+ ['Pregunta','¿Quién debe interpretar IMC, perímetro abdominal y presión en conjunto?','Un profesional de salud que conozca tu contexto clínico.','INDICADORES'],
+ ['Reto creativo','En 15 segundos, inventa una campaña para cambiar una gaseosa por agua.','Respuesta libre, creativa y respetuosa.','CREATIVIDAD'],
+ ['Verdadero o falso','Reducir el consumo excesivo de sal puede apoyar el control de la presión.','Verdadero.','ALIMENTACIÓN'],
+ ['Reto grupal','La torre se mueve: mencionen tres cambios saludables fáciles de sostener.','Caminar en pausas, planear refrigerios, dormir con regularidad, beber agua.','AUTOCUIDADO'],
+ ['Pregunta final','¿Qué significa cuidar tu salud “bloque a bloque”?','Tomar decisiones cotidianas, revisar nuestros hábitos y pedir orientación cuando haga falta.','AUTOCUIDADO']
+];
+let remaining=challenges.map((_,i)=>i),current=null,visited=0;
+function newChallenge(){if(!remaining.length)remaining=challenges.map((_,i)=>i);const slot=Math.floor(Math.random()*remaining.length);const i=remaining.splice(slot,1)[0];current=challenges[i];visited++;el('blockLabel').textContent=current[3];el('challengeType').textContent=current[0];el('challengeQuestion').textContent=current[1];el('challengeAnswer').textContent='Respuesta o guía: '+current[2];el('challengeAnswer').classList.remove('visible');el('seeAnswer').textContent='👀 Ver respuesta';el('challengeCount').textContent=(Math.min(visited,30))+' de 30 retos explorados'+(visited>30?' (segunda ronda)':'');}
+function restart(){el('healthForm').reset();noError();remaining=challenges.map((_,i)=>i);current=null;visited=0;el('blockLabel').textContent='¡TU RETO TE ESPERA!';el('challengeType').textContent='Sorpresa preventiva';el('challengeQuestion').textContent='¿Podrás retirar un bloque sin tumbar la torre?';el('challengeAnswer').classList.remove('visible');el('challengeAnswer').textContent='';el('challengeCount').textContent='0 de 30 retos explorados';el('recommendations').replaceChildren();el('alertBox').replaceChildren();showPage('intro')}
+el('begin').addEventListener('click',()=>{showPage('datos');el('peso').focus({preventScroll:true})});
+el('backIntro').addEventListener('click',()=>showPage('intro'));
+el('healthForm').addEventListener('submit',event=>{event.preventDefault();evaluate()});
+el('goJenga').addEventListener('click',()=>showPage('juego'));
+el('editData').addEventListener('click',()=>showPage('datos'));
+el('resetFromResults').addEventListener('click',restart);
+el('newChallenge').addEventListener('click',newChallenge);
+el('seeAnswer').addEventListener('click',()=>{if(!current){newChallenge();return;}const box=el('challengeAnswer');box.classList.toggle('visible');el('seeAnswer').textContent=box.classList.contains('visible')?'🙈 Ocultar respuesta':'👀 Ver respuesta'});
+el('finish').addEventListener('click',()=>showPage('gracias'));
+el('returnResult').addEventListener('click',()=>showPage('resultado'));
+el('restart').addEventListener('click',restart);
+})();
+</script>
+</body>
+</html>

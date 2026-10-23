@@ -1,0 +1,35 @@
+<div class="session-card">
+  <div class="cap">Partida por turnos</div>
+  <h3 id="turnHeading">Crea una sala o reúne a tu grupo</h3>
+  <p id="turnMessage" role="status" aria-live="polite">Cada participante responde y confirma su movimiento antes de pasar al siguiente.</p>
+  <div id="sessionSetup">
+    <label for="roomMode">Cómo van a jugar</label>
+    <select id="roomMode"><option value="online">Cada persona desde su celular · Supabase</option><option value="local">Todos con este dispositivo · sin internet</option></select>
+    <div id="onlineSetup">
+      <details id="connectionSettings" open><summary>Conectar proyecto de Supabase</summary>
+        <p class="fine">Pega la URL y la clave pública del proyecto después de ejecutar supabase/jenga.sql en el SQL Editor. Usa publishable o anon; nunca una clave secreta.</p>
+        <label for="supabaseUrl">URL del proyecto</label><input id="supabaseUrl" type="url" placeholder="https://tu-proyecto.supabase.co" autocomplete="off">
+        <label for="supabaseKey">Clave pública publishable o anon</label><input id="supabaseKey" type="text" placeholder="sb_publishable_…" autocomplete="off" spellcheck="false">
+      </details>
+      <div class="field-grid">
+        <div><label for="playerName">Tu alias en la sala</label><input id="playerName" maxlength="30" placeholder="Ej. Equipo azul" autocomplete="off"></div>
+        <div><label for="roomCode">Código de la sala (para unirse)</label><input id="roomCode" maxlength="10" placeholder="Ej. 2F8A3B7C10" autocomplete="off" autocapitalize="characters"></div>
+      </div>
+      <div class="actions"><button id="createRoom" type="button" class="btn primary">Crear sala</button><button id="joinRoom" type="button" class="btn outline">Unirme a la sala</button></div>
+      <p class="fine">Se comparten alias, orden de turnos y movimientos. Tus indicadores de salud permanecen en tu dispositivo. La sala vence a las 24 horas.</p>
+    </div>
+    <div id="localSetup" hidden>
+      <label for="localPlayers">Alias de los participantes, uno por línea y en el orden de juego</label>
+      <textarea id="localPlayers" rows="4" maxlength="1000" placeholder="Participante 1&#10;Participante 2"></textarea>
+      <button id="startLocal" type="button" class="btn primary">Comenzar partida por turnos</button>
+    </div>
+  </div>
+  <div id="roomLobby" hidden>
+    <p id="roomIdentity" class="pill"></p>
+    <ol id="playerOrder" aria-label="Orden de participantes"></ol>
+    <div class="actions"><button id="startRoom" type="button" class="btn primary">Iniciar con este orden</button><button id="shareRoom" type="button" class="btn outline">Copiar invitación</button><button id="endRoom" type="button" class="btn outline" hidden>La torre real cayó · terminar ronda</button><button id="leaveRoom" type="button" class="btn outline">Salir de este dispositivo</button></div>
+    <p class="fine">El facilitador también participa. El orden se fija al iniciar; las personas nuevas entran en la próxima ronda. Salir no elimina tu puesto: vuelve desde este navegador para recuperarlo.</p>
+  </div>
+  <p id="connectionStatus" class="fine" role="status"></p>
+  <p id="roomError" class="error" role="alert"></p>
+</div>

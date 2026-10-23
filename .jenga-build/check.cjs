@@ -1,0 +1,1 @@
+﻿require("./check-rooms.cjs");
