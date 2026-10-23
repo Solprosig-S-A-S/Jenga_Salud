@@ -116,7 +116,7 @@ s=s.replace('<script>\n(function(){',vendor+'<script>\n(function(){',1)
 config_path=Path('.jenga-build/supabase-config.json')
 project_config=json.loads(config_path.read_text(encoding='utf-8')) if config_path.exists() else {}
 config_js='window.JENGA_PROJECT='+json.dumps(project_config,ensure_ascii=True).replace('<','\\u003c')+';\n'
-s=s.replace('</body>','<script>\n'+config_js+Path('.jenga-build/session.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+j+'\n</script>\n<script>\n'+Path('.jenga-build/game-ui.js').read_text(encoding='utf-8')+'\n</script>\n</body>')
+s=s.replace('</body>','<script>\n'+config_js+Path('.jenga-build/session.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+Path('.jenga-build/motion.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+j+'\n</script>\n<script>\n'+Path('.jenga-build/game-ui.js').read_text(encoding='utf-8')+'\n</script>\n</body>')
 p.write_text(s,encoding='utf-8')
 Path('index.html').write_text(s,encoding='utf-8')
 print('HTML integrado:',p.stat().st_size,'bytes')

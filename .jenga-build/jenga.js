@@ -4,6 +4,8 @@ const $=id=>document.getElementById(id), host=$('towerView');
 let scene,camera,renderer,world,blocks=[],selected=null,phase='ready',motion=null,elapsed=0,turn=0,topSlots=0,fallen=false,started=false,last=0;
 let azimuth=.72,elevation=.24,radius=24,drag=null;
 let appliedMoves=[],roomCode=null,pendingCanonical=null;
+let cameraCue=null,cameraZoom=1,cameraTargetY=5.5,entranceTime=0;
+const animations=()=>window.JengaMotion;
 const session=()=>window.JengaSession;
 const H=.6,W=1,L=3,GAP=.018,STEP=H+.004;
 const wood=new CANNON.Material('wood'),sliding=new CANNON.Material('sliding-wood');
@@ -15,13 +17,20 @@ function controls(){const ready=phase==='ready'&&!fallen;
 
 }
 function options(){const list=$('blockPicker');list.replaceChildren(new Option('Seleccionar una pieza…',''));eligible().sort((a,b)=>a.id-b.id).forEach(b=>list.add(new Option('#'+b.id+' · nivel '+(b.level+1)+' · posición '+(b.slot+1),b.id)));}
-function select(b){if(!b)return;selected=b;$('blockPicker').value=b.id;
+function select(b){if(!b)return;
+ if(selected?.id!==b.id&&animations()?.enabled()&&!animations().paused()){
+   const goal=(b.level%2?Math.PI:Math.PI/2)+.22;
+   const angle=((goal-azimuth+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
+   cameraCue={from:azimuth,to:azimuth+angle,t:0};
+ }
+ selected=b;$('blockPicker').value=b.id;
  window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
  $('pieceInstruction').textContent='Saca la pieza #'+b.id;
  $('pieceDetail').textContent='Nivel '+(b.level+1)+' · posición '+(b.slot+1)+'/3';
  status('Pieza asignada. Responde su pregunta antes de confirmar la retirada.');controls();}
 function choose(b){if(phase!=='ready'||fallen||!session()?.can('draw')||!eligible().includes(b))return;session().act('draw',{blockId:b.id});}
 function canonical(moves){
+ if(!moves.length&&appliedMoves.length)entranceTime=0;
  pendingCanonical=null;window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));
  blocks.forEach(b=>{b.level=Math.floor((b.id-1)/3);b.slot=(b.id-1)%3;});
  moves.forEach((id,index)=>{const b=blocks.find(b=>b.id===id);if(b){b.level=18+Math.floor(index/3);b.slot=index%3;}});
@@ -49,7 +58,21 @@ function roomUpdate(next,previous){
  window.dispatchEvent(new CustomEvent('jenga-answer-state',{detail:{revealed:next.revealed}}));
  controls();
 }
-function aim(){camera.position.set(Math.sin(azimuth)*radius*Math.cos(elevation),5.5+Math.sin(elevation)*radius,Math.cos(azimuth)*radius*Math.cos(elevation));camera.lookAt(0,5.5,0);}
+function aim(){if(!camera)return;const distance=radius*cameraZoom;camera.position.set(Math.sin(azimuth)*distance*Math.cos(elevation),cameraTargetY+Math.sin(elevation)*distance,Math.cos(azimuth)*distance*Math.cos(elevation));camera.lookAt(0,cameraTargetY,0);}
+function manualCamera(){cameraCue=null;animations()?.pause(8000);}
+function animateCamera(dt,time){
+ const active=document.activeElement;
+ if(active&&/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName)){animations()?.pause(1000);return;}
+ if(!animations()?.enabled()||animations().paused()||drag||document.getElementById('gameMenu')?.open)return;
+ if(cameraCue){
+   cameraCue.t=Math.min(1,cameraCue.t+dt/1.35);const t=cameraCue.t,s=t*t*(3-2*t);
+   azimuth=cameraCue.from+(cameraCue.to-cameraCue.from)*s;if(t===1)cameraCue=null;
+ }else if(!selected&&!motion&&!fallen){azimuth+=dt*.12;}
+ const focus=motion?.b||selected,zoom=focus ? .96 : 1+Math.sin(time*.0005)*.008;
+ cameraZoom+=(zoom-cameraZoom)*Math.min(1,dt*3);
+ const target=focus?5.5+(focus.body.position.y-5.5)*.07:5.5+Math.sin(time*.00035)*.06;
+ cameraTargetY+=(target-cameraTargetY)*Math.min(1,dt*2.5);aim();
+}
 function texture(id,end=false){const c=document.createElement('canvas');c.width=end?192:512;c.height=128;const x=c.getContext('2d');x.fillStyle='#d9aa70';x.fillRect(0,0,512,128);
  let seed=id*719+13;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
  for(let i=0;i<100;i++){x.strokeStyle='rgba(99,54,22,'+(.025+rnd()*.10)+')';x.lineWidth=.4+rnd()*1.2;x.beginPath();const y=rnd()*128; x.moveTo(0,y);x.bezierCurveTo(130,y+8*rnd(),350,y-8*rnd(),512,y+5*rnd());x.stroke();}
@@ -68,7 +91,7 @@ function init(){if(started)return;started=true;
  const ground=new CANNON.Body({mass:0,material:wood,shape:new CANNON.Plane()});ground.quaternion.setFromEuler(-Math.PI/2,0,0);world.addBody(ground);
  reset();roomUpdate(session()?.getState(),null);new ResizeObserver(resize).observe(host);
  const canvas=renderer.domElement;
- canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ox:e.clientX,oy:e.clientY};canvas.setPointerCapture(e.pointerId);});
+ canvas.addEventListener('pointerdown',e=>{manualCamera();drag={x:e.clientX,y:e.clientY,ox:e.clientX,oy:e.clientY};canvas.setPointerCapture(e.pointerId);});
  canvas.addEventListener('pointermove',e=>{if(!drag)return;azimuth-=(e.clientX-drag.x)*.009;elevation=Math.max(-.05,Math.min(.8,elevation+(e.clientY-drag.y)*.005));drag.x=e.clientX;drag.y=e.clientY;aim();});
  canvas.addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag.ox,e.clientY-drag.oy)<6){const r=canvas.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(blocks.map(b=>b.mesh));if(hits.length)choose(hits[0].object.userData.block);}drag=null;});
  canvas.addEventListener('pointercancel',()=>drag=null);
@@ -76,6 +99,7 @@ function init(){if(started)return;started=true;
 }
 function resize(){if(!renderer||!host.clientWidth)return;const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
 function reset(){if(!world)return;
+ entranceTime=0;cameraCue=null;
  window.dispatchEvent(new Event('jenga-board-reset'));
  blocks.forEach(b=>{world.removeBody(b.body);scene.remove(b.mesh);b.mesh.geometry.dispose();new Set(b.mesh.material).forEach(m=>{m.map.dispose();m.dispose();});});blocks=[];selected=null;motion=null;turn=0;topSlots=0;fallen=false;elapsed=0;phase='settling';
  for(let level=0;level<18;level++)for(let slot=0;slot<3;slot++){
@@ -90,7 +114,7 @@ function extract(){if(!selected||phase!=='ready'||fallen)return;window.dispatchE
 function place(){const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
  b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();topSlots++;turn++;$('towerTurns').textContent=turn+(turn===1?' pieza retirada':' piezas retiradas');phase='settling';elapsed=0;selected=null;motion=null;status('Pieza colocada arriba. Esperando a que la torre se estabilice…');}
 function collapse(){fallen=true;phase='fallen';selected=null;if(motion){motion.b.body.material=wood;motion.b.body.type=CANNON.Body.DYNAMIC;motion.b.body.updateMassProperties();motion.b.body.wakeUp();}motion=null;status('La torre virtual cayó. Si la torre real sigue en pie, puedes reconstruir la simulación.');$('pieceInstruction').textContent='¡La torre perdió el equilibrio!';$('pieceDetail').textContent='Reconstruye la torre para comenzar otra ronda.';controls();}
-function update(dt){elapsed+=dt;
+function update(dt){elapsed+=dt;entranceTime=animations()?.enabled()?entranceTime+dt:2;
  if(phase==='pulling'){
  const {b,origin,dir}=motion;
  // The confirmed move is guided by a virtual hand; contacts act on the remaining dynamic blocks.
@@ -115,15 +139,18 @@ function update(dt){elapsed+=dt;
    const nextId=session()?.getState()?.selectedId;if(nextId)select(blocks.find(b=>b.id===nextId));
    window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();status('Torre lista. Continúa siguiendo el orden de turnos.');
  }
- blocks.forEach(b=>{b.mesh.position.copy(b.body.position);b.mesh.quaternion.copy(b.body.quaternion);b.mesh.material.forEach(m=>{m.emissive.setHex(b===selected?0x359b66:0x000000);m.emissiveIntensity=b===selected?.45+.18*Math.sin(performance.now()*.005):0;});});
+ blocks.forEach(b=>{b.mesh.position.copy(b.body.position);b.mesh.quaternion.copy(b.body.quaternion);
+   if(animations()?.enabled()&&entranceTime<1.6){const t=Math.max(0,Math.min(1,(entranceTime-b.level*.025-b.slot*.02)/.65));b.mesh.position.y+=(2+b.level*.08)*Math.pow(1-t,3);}
+   b.mesh.material.forEach(m=>{m.emissive.setHex(b===selected?0x359b66:0x000000);m.emissiveIntensity=b===selected ? (animations()?.enabled() ? .45+.18*Math.sin(performance.now()*.005) : .5) : 0;});
+ });
 }
-function frame(time){requestAnimationFrame(frame);const dt=Math.min((time-last)/1000||1/60,.04);last=time;if(!document.hidden&&$('juego').classList.contains('active')&&renderer&&host.clientWidth){update(dt);renderer.render(scene,camera);}}
+function frame(time){requestAnimationFrame(frame);const dt=Math.min((time-last)/1000||1/60,.04);last=time;if(!document.hidden&&$('juego').classList.contains('active')&&renderer&&host.clientWidth){update(dt);animateCamera(dt,time);renderer.render(scene,camera);}}
 $('drawBlock').addEventListener('click',()=>{const choices=eligible();if(choices.length)choose(choices[Math.floor(Math.random()*choices.length)]);else status('No quedan piezas disponibles bajo los dos niveles superiores. Reconstruye la torre.');});
 $('blockPicker').addEventListener('change',e=>{const b=blocks.find(b=>b.id===Number(e.target.value));if(b)choose(b);});
 $('confirmBlock').addEventListener('click',()=>{if(selected&&phase==='ready')session()?.act('complete');});
 $('rebuildTower').addEventListener('click',()=>session()?.act('reset'));
-$('rotateLeft').addEventListener('click',()=>{azimuth-=Math.PI/4;aim();});$('rotateRight').addEventListener('click',()=>{azimuth+=Math.PI/4;aim();});
-$('zoomTower').addEventListener('input',e=>{radius=Number(e.target.value);aim();});
+$('rotateLeft').addEventListener('click',()=>{manualCamera();azimuth-=Math.PI/4;aim();});$('rotateRight').addEventListener('click',()=>{manualCamera();azimuth+=Math.PI/4;aim();});
+$('zoomTower').addEventListener('input',e=>{manualCamera();radius=Number(e.target.value);aim();});
 window.addEventListener('jenga-open',()=>{init();resize();});window.addEventListener('jenga-reset',()=>{if(world){const current=session()?.getState();if(current){canonical(current.moves);if(current.selectedId)select(blocks.find(b=>b.id===current.selectedId));}else reset();}});
 window.addEventListener('jenga-permissions',controls);
 window.addEventListener('jenga-room-state',event=>roomUpdate(event.detail.state,event.detail.previous));

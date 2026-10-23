@@ -4,12 +4,14 @@
       <!-- SESSION -->
       <div id="playArena" class="play-arena" data-step="choose" hidden>
         <div class="tower-stage">
+          <div id="turnToast" class="turn-toast" aria-hidden="true" hidden></div>
           <div class="tower-hud"><span id="blockLabel" class="tower-badge">Tu próximo bloque</span><button id="expandTower" type="button" aria-expanded="false" aria-label="Ampliar torre">⤢</button></div>
           <div id="towerView" class="tower-view"></div>
           <div class="tower-controls" aria-label="Controles de la cámara">
             <button id="rotateLeft" type="button" aria-label="Girar vista a la izquierda">↶</button>
             <span id="pieceDetail" class="piece-location">Arrastra para girar</span>
             <button id="rotateRight" type="button" aria-label="Girar vista a la derecha">↷</button>
+            <button id="motionToggle" type="button" aria-pressed="true" aria-label="Pausar animaciones automáticas">⏸</button>
             <label class="tower-zoom">Zoom <input id="zoomTower" type="range" min="17" max="34" value="24" aria-label="Distancia de la cámara"></label>
           </div>
           <div id="towerStatus" class="tower-status" role="status" aria-live="polite">Preparando la torre…</div>

@@ -2,6 +2,9 @@
 'use strict';
 const $=id=>document.getElementById(id),mobile=matchMedia('(max-width:700px)'),menu=$('gameMenu');
 let moving=false,responseKey='',lastStatus='',lastPiece=null;
+let toastTimer=null;
+function effect(node,frames,duration=400){if(window.JengaMotion?.enabled())node.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});}
+function hideToast(){clearTimeout(toastTimer);$('turnToast').hidden=true;}
 function openMenu(){if(!menu.open)menu.showModal();}
 function closeMenu(){if(menu.open)menu.close();}
 function fitViewport(){document.documentElement.style.setProperty('--game-height',Math.round(window.visualViewport?.height||innerHeight)+'px');}
@@ -13,7 +16,7 @@ function render(){
  document.querySelector('.session-card').classList.toggle('room-active',playing);
  if(playing){if($('roomLobby').parentElement!==$('gameMenuRoom'))$('gameMenuRoom').appendChild($('roomLobby'));}
  else if($('roomLobby').parentElement===$('gameMenuRoom'))$('roomLobbyMount').after($('roomLobby'));
- if(!visible){closeMenu();document.body.classList.remove('tower-expanded');}
+ if(!visible){closeMenu();hideToast();document.body.classList.remove('tower-expanded');}
  if(state?.status!==lastStatus){closeMenu();lastStatus=state?.status||'';}
  const mine=!!state&&(!session.isOnline()||state.activeId===state.selfId),ended=state?.status==='ended';
  const chosen=state?.selectedId!==null&&state?.selectedId!==undefined;
@@ -46,7 +49,8 @@ function render(){
  if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu pieza':'responde el reto'):'elige una pieza'):'Es el turno de '+active+'.';
  if(chosen&&lastPiece!==state.selectedId){
   document.body.classList.remove('tower-expanded');$('questionPanel').scrollTop=0;
-  if(!matchMedia('(prefers-reduced-motion:reduce)').matches)$('challengeQuestion').animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:220});
+  effect($('challengeQuestion'),[{opacity:.2,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],420);
+  effect($('blockLabel'),[{transform:'scale(.88)'},{transform:'scale(1.07)',offset:.65},{transform:'scale(1)'}],650);
  }
  lastPiece=state?.selectedId;
  const expanded=document.body.classList.contains('tower-expanded');$('expandTower').setAttribute('aria-expanded',String(expanded));$('expandTower').setAttribute('aria-label',expanded?'Volver a la pregunta':'Ampliar torre');$('expandTower').textContent=expanded?'⤡':'⤢';
@@ -61,6 +65,20 @@ $('markAnswered').addEventListener('click',()=>$('playerResponse').blur());
 window.addEventListener('jenga-board-busy',event=>{moving=event.detail;render();});
 window.addEventListener('jenga-permissions',render);window.addEventListener('jenga-challenge',render);window.addEventListener('jenga-answer-state',render);window.addEventListener('experience-page',render);
 window.addEventListener('jenga-reset',()=>{moving=false;responseKey='';render();});
+window.addEventListener('jenga-room-state',event=>{
+ const {state,previous}=event.detail;if(!state||state.status!=='playing'){hideToast();return;}
+ if(!previous||state.activeId!==previous.activeId||state.turn!==previous.turn||previous.status!=='playing'){
+  if(!window.JengaMotion?.enabled())return;
+  const name=state.players.find(p=>p.id===state.activeId)?.name||'';
+  $('turnToast').textContent='Turno de '+name;clearTimeout(toastTimer);$('turnToast').hidden=false;
+  effect($('turnToast'),[{opacity:0,transform:'translateY(-12px) scale(.9)'},{opacity:1,transform:'translateY(0) scale(1)',offset:.16},{opacity:1,transform:'translateY(0) scale(1)',offset:.8},{opacity:0,transform:'translateY(-5px) scale(.98)'}],2100);
+  toastTimer=setTimeout(hideToast,2100);
+  effect($('turnHeading'),[{opacity:.3,transform:'translateX(-8px)'},{opacity:1,transform:'translateX(0)'}],450);
+ }
+ if(state.revealed&&!previous?.revealed)effect($('challengeAnswer'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],400);
+ if(state.answered&&!previous?.answered)effect($('confirmBlock'),[{transform:'scale(.94)'},{transform:'scale(1)'}],350);
+});
+window.addEventListener('jenga-motion-change',()=>{if(!window.JengaMotion?.enabled()){hideToast();document.querySelectorAll('#juego *').forEach(node=>node.getAnimations().forEach(animation=>animation.cancel()));}});
 mobile.addEventListener('change',render);
 window.visualViewport?.addEventListener('resize',fitViewport);window.addEventListener('resize',fitViewport);fitViewport();
 render();
