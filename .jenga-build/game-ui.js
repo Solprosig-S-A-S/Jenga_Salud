@@ -33,19 +33,19 @@ function render(){
  $('markAnswered').hidden=!playing||!mine||!chosen||state.answered||moving||ended;
  $('confirmBlock').hidden=!playing||!mine||!chosen||!state.answered||moving||ended;
  $('seeAnswer').hidden=!playing||!mine||!chosen||!state.answered||state.revealed||moving||ended;
- $('markAnswered').textContent='Ya respondí';$('confirmBlock').textContent='Ya la coloqué · siguiente';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
+ $('markAnswered').textContent='Guardar respuesta';$('confirmBlock').textContent='Ya la coloqué · siguiente';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
  $('waitingTurn').hidden=!playing||ended||(!moving&&mine);
  const active=state?.players.find(p=>p.id===state.activeId)?.name||'';
  $('waitingTurn').textContent=moving?'La torre se está acomodando…':'Juega '+active;
  $('openRoundMenu').hidden=!ended;$('roundEndHint').hidden=!ended;
  $('openRoundMenu').textContent=state?.isHost?'Abrir nueva ronda':'Ver la partida';
  $('responseArea').hidden=!playing||!mine||!chosen||state.answered||moving||ended;
- const key=state?[state.code,state.turn,state.selectedId].join(':'):'';
+ const key=state?[state.code,state.sessionId,state.round,state.turn,state.selectedId].join(':'):'';
  if(key!==responseKey){$('playerResponse').value='';$('playerResponse').style.height='';$('responseEcho').textContent='';responseKey=key;}
  const written=$('playerResponse').value.trim();
  $('responseEcho').hidden=!mine||!chosen||!state?.answered||!written;
  if(!$('responseEcho').hidden)$('responseEcho').textContent='Tu respuesta: '+written;
- $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Sortea o elige el número de tu pieza.':step==='answer'?'Responde por escrito o en voz alta.':'Retira la pieza real y colócala arriba.';
+ $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Sortea o elige el número de tu pieza.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
  if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu pieza':'responde el reto'):'elige una pieza'):'Es el turno de '+active+'.';
  if(chosen&&lastPiece!==state.selectedId){
   document.body.classList.remove('tower-expanded');$('questionPanel').scrollTop=0;

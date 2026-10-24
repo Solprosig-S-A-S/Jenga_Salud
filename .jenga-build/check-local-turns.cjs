@@ -5,6 +5,7 @@ const {pathToFileURL}=require('node:url');
  const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--no-sandbox','--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
   const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('https://*.supabase.co/**',route=>route.abort());
   await page.goto(pathToFileURL(path.resolve('SOLPROSIG_Jenga_Salud_Listo_Para_Usar (2).html')).href);
   await page.locator('#begin').click();await page.locator('#peso').fill('70');await page.locator('#talla').fill('170');await page.locator('#submitHealth').click();await page.locator('#goJenga').click();
   assert(await page.locator('#drawBlock').isDisabled());await page.locator('#roomMode').selectOption('local');
@@ -15,6 +16,8 @@ const {pathToFileURL}=require('node:url');
   await page.locator('#manualChoice summary').click();await page.locator('#blockPicker').selectOption('31');assert((await page.locator('#challengeQuestion').innerText()).includes('siempre produce'));
   assert(await page.locator('#blockPicker').isDisabled());assert(await page.locator('#confirmBlock').isDisabled());assert(await page.locator('#seeAnswer').isDisabled());
   assert.equal(await page.evaluate(()=>window.JengaSession.can('complete')),false);
+  await page.locator('#markAnswered').click();assert((await page.locator('#roomError').innerText()).includes('Escribe tu respuesta'));
+  await page.locator('#playerResponse').fill('Respuesta local de Ana');
   await page.locator('#markAnswered').click();await page.locator('#seeAnswer').click();assert(await page.locator('#challengeAnswer').isVisible());
   await page.locator('#confirmBlock').click();await page.waitForFunction(()=>window.JengaSession.getState()?.turn===1);
   assert((await page.locator('#turnHeading').innerText()).includes('Luis'));

@@ -6,6 +6,7 @@ const {pathToFileURL}=require('node:url');
  try{
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('https://*.supabase.co/**',route=>route.abort());
   await page.goto(pathToFileURL(path.resolve('index.html')).href);
   await page.locator('#begin').click();await page.locator('#peso').fill('70');await page.locator('#talla').fill('170');await page.locator('#submitHealth').click();await page.locator('#goJenga').click();
   await page.locator('#roomMode').selectOption('local');await page.locator('#localPlayers').fill('Ana\nLuis');await page.locator('#startLocal').click();

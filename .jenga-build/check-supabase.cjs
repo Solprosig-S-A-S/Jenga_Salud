@@ -8,6 +8,7 @@ const assert=require('node:assert/strict');
   await db.exec('set role anon;');
   const host='host-'.repeat(12),guest='guest-'.repeat(12),outsider='other-'.repeat(12);
   async function rpc(action,token,code='',expected=-1,payload={},name='Alias'){
+    if(action==='answer'&&!Object.keys(payload).length)payload={response:'Respuesta escrita de prueba'};
     return (await db.query('select public.jenga_room($1,$2,$3,$4,$5,$6::jsonb) as state',[action,code,token,name,expected,JSON.stringify(payload)])).rows[0].state;
   }
   let room=await rpc('create',host,'',-1,{},'Ana');
@@ -33,7 +34,10 @@ const assert=require('node:assert/strict');
   await assert.rejects(()=>rpc('draw',host,code,room.revision,{blockId:5}),/Ya hay una pieza/);
   await assert.rejects(()=>rpc('reveal',host,code,room.revision),/Primero confirma/);
   await assert.rejects(()=>rpc('complete',host,code,room.revision),/Debes responder/);
+  await assert.rejects(()=>rpc('answer',host,code,room.revision,{response:''}),/Escribe/);
+  await assert.rejects(()=>rpc('answer',host,code,room.revision,{response:'x'.repeat(501)}),/Escribe/);
   room=await rpc('answer',host,code,room.revision);
+  await assert.rejects(()=>rpc('answer',host,code,room.revision),/ya tiene/);
   room=await rpc('reveal',host,code,room.revision);assert(room.revealed);
   const previousRevision=room.revision;
   room=await rpc('complete',host,code,previousRevision);
@@ -51,6 +55,8 @@ const assert=require('node:assert/strict');
   room=await rpc('reset',host,code,room.revision);assert.equal(room.status,'lobby');assert.deepEqual(room.moves,[]);
   assert(!JSON.stringify(room).includes('token_hash'));assert(!JSON.stringify(room).includes(host));
   await db.exec('reset role;');
+  const answers=(await db.query('select * from public.jenga_answers order by id')).rows;
+  assert.equal(answers.length,2);assert.equal(answers[0].alias,'Ana');assert.equal(answers[0].block_id,23);assert.equal(answers[0].response,'Respuesta escrita de prueba');assert.equal(answers[1].alias,'Luis');assert.equal(answers[0].round_no,1);
   await db.exec("update public.jenga_rooms set expires_at=now()-interval '1 hour';");
   await db.exec('set role anon;');
   await assert.rejects(()=>rpc('sync',host,code),/venció/);

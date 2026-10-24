@@ -20,7 +20,8 @@
           <div class="turn-progress" aria-label="Pasos del turno"><span data-turn-step="choose">1 · Elige</span><span data-turn-step="answer">2 · Responde</span><span data-turn-step="move">3 · Mueve</span></div>
           <div class="question-meta"><span id="challengeType" class="pill">Una pieza, una pregunta</span><span id="pieceInstruction">¿Qué pieza saldrá?</span></div>
           <h2 id="challengeQuestion" class="challenge-title" aria-live="polite">Sortea una pieza para descubrir tu reto.</h2>
-          <div id="responseArea" class="response-area" hidden><label for="playerResponse">Tu respuesta</label><textarea id="playerResponse" rows="2" maxlength="500" placeholder="Escribe aquí o responde en voz alta…"></textarea></div>
+          <div id="responseArea" class="response-area" hidden><label for="playerResponse">Tu respuesta</label><textarea id="playerResponse" rows="2" maxlength="500" required placeholder="Escribe tu respuesta para guardarla…"></textarea></div>
+          <p id="answerSaveStatus" class="fine" role="status" aria-live="polite">Las respuestas se guardan con tu alias. Evita incluir datos personales.</p>
           <p id="responseEcho" class="response-echo" hidden></p>
           <div class="reveal" id="challengeAnswer" role="status"></div>
           <p id="roundEndHint" class="round-end-hint" hidden>La ronda terminó. ¡Buen trabajo, equipo!</p>

@@ -1,5 +1,89 @@
 -- Ejecutar completo en Supabase > SQL Editor. No requiere claves secretas en el HTML.
 begin;
+
+-- Las respuestas sobreviven al vencimiento o eliminación de una sala.
+create table if not exists public.jenga_questions (
+  id integer primary key check(id between 1 and 30), question text not null
+);
+alter table public.jenga_questions enable row level security;
+revoke all on public.jenga_questions from public, anon, authenticated;
+insert into public.jenga_questions(id,question) values
+(1,'La presión arterial elevada siempre produce síntomas.'),
+(2,'El IMC relaciona el peso con la ______.'),
+(3,'¿Qué significan las letras IMC?'),
+(4,'El exceso de alcohol puede elevar la presión arterial.'),
+(5,'Nombren tres formas de moverse durante la jornada laboral.'),
+(6,'¿Por qué es útil conocer el perímetro abdominal?'),
+(7,'El número de arriba en la presión arterial se llama ______.'),
+(8,'El número de abajo en la presión arterial se llama ______.'),
+(9,'Un IMC habitual significa que ya no necesito controles de salud.'),
+(10,'Inventa un lema que incluya la palabra “corazón”.'),
+(11,'Digan cuatro alimentos que aporten fibra.'),
+(12,'¿Cuántos minutos semanales de actividad moderada se recomiendan para adultos?'),
+(13,'Estar sentado muchas horas sin pausas no importa si hago ejercicio un día a la semana.'),
+(14,'Representa sin palabras una pausa activa que harías en la oficina.'),
+(15,'¿Qué bebida conviene elegir con mayor frecuencia para hidratarnos?'),
+(16,'El sueño también hace parte del cuidado cardiovascular.'),
+(17,'Puedo saber si tengo hipertensión solo con mi peso.'),
+(18,'Mencionen tres alternativas para compartir sin tomar alcohol.'),
+(19,'Una forma de disminuir azúcar en bebidas es elegir más ______.'),
+(20,'¿Qué harías si tienes una presión muy alta en una medición?'),
+(21,'Caminar, bailar o montar bicicleta pueden contar como actividad física.'),
+(22,'Inventa una frase corta para motivar a beber más agua.'),
+(23,'¿Por qué una sola medición de presión no confirma hipertensión?'),
+(24,'Propongan tres hábitos que apoyen la salud metabólica.'),
+(25,'Fumar solo ocasionalmente no afecta la salud del corazón.'),
+(26,'¿Quién debe interpretar IMC, perímetro abdominal y presión en conjunto?'),
+(27,'En 15 segundos, inventa una campaña para cambiar una gaseosa por agua.'),
+(28,'Reducir el consumo excesivo de sal puede apoyar el control de la presión.'),
+(29,'La torre se mueve: mencionen tres cambios saludables fáciles de sostener.'),
+(30,'¿Qué significa cuidar tu salud “bloque a bloque”?')
+on conflict(id) do update set question=excluded.question;
+create table if not exists public.jenga_answers (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  mode text not null check(mode in ('online','local')),
+  room_code text,
+  local_session uuid,
+  request_id uuid unique,
+  alias text not null check(length(alias) between 1 and 30),
+  round_no integer not null check(round_no>=1),
+  turn_no integer not null check(turn_no>=0),
+  block_id integer not null check(block_id between 1 and 54),
+  question_no integer not null check(question_no between 1 and 30),
+  question text not null,
+  response text not null check(length(trim(response)) between 1 and 500),
+  unique(room_code,round_no,turn_no),
+  unique(local_session,round_no,turn_no)
+);
+create index if not exists jenga_answers_created_at on public.jenga_answers(created_at);
+alter table public.jenga_answers enable row level security;
+revoke all on public.jenga_answers from public, anon, authenticated;
+
+-- En modo local el facilitador declara los alias; no es una identidad verificada.
+-- request_id y sesión/ronda/turno hacen seguros los reintentos tras reconectar.
+create or replace function public.jenga_save_local_answer(p_answer jsonb)
+returns void language plpgsql security definer set search_path = '' as $$
+declare
+  question_id integer;
+begin
+  if jsonb_typeof(p_answer->'response') is distinct from 'string'
+    or length(trim(p_answer->>'response')) not between 1 and 500 then
+    raise exception 'Escribe una respuesta de 1 a 500 caracteres.';
+  end if;
+  if p_answer->>'id' is null or p_answer->>'session' is null then
+    raise exception 'Falta identificar la respuesta local.';
+  end if;
+  question_id := (((p_answer->>'block')::integer-1)%30)+1;
+  insert into public.jenga_answers(mode,local_session,request_id,alias,round_no,turn_no,block_id,question_no,question,response)
+  values('local',(p_answer->>'session')::uuid,(p_answer->>'id')::uuid,trim(p_answer->>'alias'),
+    (p_answer->>'round')::integer,(p_answer->>'turn')::integer,(p_answer->>'block')::integer,
+    question_id,(select question from public.jenga_questions where id=question_id),trim(p_answer->>'response'))
+  on conflict do nothing;
+end;
+$$;
+revoke all on function public.jenga_save_local_answer(jsonb) from public;
+grant execute on function public.jenga_save_local_answer(jsonb) to anon, authenticated;
 create table if not exists public.jenga_rooms (
   code text primary key,
   host_hash text not null,
@@ -45,7 +129,7 @@ begin
     select * into r from public.jenga_rooms where host_hash=token_hash_value and expires_at>now() order by created_at desc limit 1 for update;
     if not found then
       code_value := upper(substr(replace(gen_random_uuid()::text,'-',''),1,10));
-      st := jsonb_build_object('status','lobby','selectedId',null,'answered',false,'revealed',false,'turn',0,'moves','[]'::jsonb,'activeId',null);
+      st := jsonb_build_object('status','lobby','selectedId',null,'answered',false,'revealed',false,'round',1,'turn',0,'moves','[]'::jsonb,'activeId',null);
       insert into public.jenga_rooms(code,host_hash,state) values(code_value,token_hash_value,st) returning * into r;
       insert into public.jenga_players(room_code,token_hash,nickname,seat) values(r.code,token_hash_value,trim(p_name),0);
     end if;
@@ -80,7 +164,7 @@ begin
         if st->>'status'<>'playing' then raise exception 'La partida no está en curso.'; end if;
         st := st || jsonb_build_object('status','ended');
       else
-        st := jsonb_build_object('status','lobby','selectedId',null,'answered',false,'revealed',false,'turn',0,'moves','[]'::jsonb,'activeId',null);
+        st := jsonb_build_object('status','lobby','selectedId',null,'answered',false,'revealed',false,'round',coalesce((st->>'round')::integer,1)+1,'turn',0,'moves','[]'::jsonb,'activeId',null);
       end if;
     else
       if st->>'status'<>'playing' then raise exception 'La partida no está en curso.'; end if;
@@ -106,6 +190,15 @@ begin
       else
         if st->>'selectedId' is null then raise exception 'Primero sortea una pieza.'; end if;
         if p_action='answer' then
+          if (st->>'answered')::boolean then raise exception 'Este turno ya tiene una respuesta.'; end if;
+          if jsonb_typeof(p_payload->'response') is distinct from 'string'
+            or length(trim(p_payload->>'response')) not between 1 and 500 then
+            raise exception 'Escribe una respuesta de 1 a 500 caracteres.';
+          end if;
+          insert into public.jenga_answers(mode,room_code,alias,round_no,turn_no,block_id,question_no,question,response)
+          values('online',r.code,player.nickname,coalesce((st->>'round')::integer,1),
+            (st->>'turn')::integer,(st->>'selectedId')::integer,((st->>'selectedId')::integer-1)%30+1,
+            (select question from public.jenga_questions where id=((st->>'selectedId')::integer-1)%30+1),trim(p_payload->>'response'));
           st := st || jsonb_build_object('answered',true);
         elsif p_action='reveal' then
           if not (st->>'answered')::boolean then raise exception 'Primero confirma que respondiste en voz alta.'; end if;
@@ -128,3 +221,5 @@ $$;
 revoke all on function public.jenga_room(text,text,text,text,integer,jsonb) from public;
 grant execute on function public.jenga_room(text,text,text,text,integer,jsonb) to anon, authenticated;
 commit;
+
+notify pgrst, 'reload schema';

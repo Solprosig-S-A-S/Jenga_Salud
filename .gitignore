@@ -2,6 +2,7 @@
 node_modules/
 .jenga-build/npm-cache/
 .jenga-build/*.png
+.jenga-build/*-test.xlsx
 .jenga-build/supabase-probe.json
 .jenga-build/syntax-check.js
 .pages/

@@ -24,7 +24,7 @@ function render(){
   if(state){
     const person=active();
     $('turnHeading').textContent=state.status==='ended'?'Ronda terminada':state.status==='lobby'?'Esperando al grupo':('Turno '+(state.turn+1)+' · '+(person?.name||''));
-    $('turnMessage').textContent=state.status==='lobby'?'El facilitador inicia cuando todos estén en la sala.':(mode==='local'?'Pasa el dispositivo a '+person?.name+'.':(state.activeId===state.selfId?'Es tu turno.':'Espera: está jugando '+person?.name+'.'))+' Primero elige una pieza, responde en voz alta y confirma su retirada.';
+    $('turnMessage').textContent=state.status==='lobby'?'El facilitador inicia cuando todos estén en la sala.':(mode==='local'?'Pasa el dispositivo a '+person?.name+'.':(state.activeId===state.selfId?'Es tu turno.':'Espera: está jugando '+person?.name+'.'))+' Primero elige una pieza, escribe tu respuesta y confirma su retirada.';
     if(state.status==='ended')$('turnMessage').textContent='El facilitador puede reconstruir la torre y abrir una nueva ronda con el mismo grupo.';
     $('roomIdentity').textContent=mode==='local'?'Partida local · orden obligatorio':'Sala '+state.code+' · tú: '+(state.players.find(p=>p.id===state.selfId)?.name||'');
     $('playerOrder').replaceChildren(...state.players.map(p=>{const li=document.createElement('li');li.textContent=p.name+(p.id===state.activeId?' · jugando ahora':'');if(p.id===state.activeId)li.className='current-player';return li;}));
@@ -78,7 +78,7 @@ function localAction(action,payload){
   if(action==='answer')next.answered=true;
   if(action==='reveal')next.revealed=true;
   if(action==='complete'){next.moves.push(next.selectedId);next.selectedId=null;next.answered=false;next.revealed=false;next.turn++;next.activeId=next.players[(next.players.findIndex(p=>p.id===next.activeId)+1)%next.players.length].id;}
-  if(action==='reset'){Object.assign(next,{status:'lobby',selectedId:null,answered:false,revealed:false,turn:0,moves:[],activeId:null});}
+  if(action==='reset'){Object.assign(next,{status:'lobby',selectedId:null,answered:false,revealed:false,round:next.round+1,turn:0,moves:[],activeId:null});}
   if(action==='end')next.status='ended';
   next.revision++;return next;
 }
@@ -89,8 +89,17 @@ async function sync(){
 }
 async function act(action,payload={}){
   if(!can(action))return false;
+  if(action==='answer'){
+    payload=window.JengaAnswers.payload();
+    if(!payload.response||payload.response.length>500){error('Escribe tu respuesta antes de guardarla (máximo 500 caracteres).');$('playerResponse').focus();return false;}
+  }
   busy=true;error('');render();
-  try{apply(mode==='local'?localAction(action,payload):await rpc(action,payload));return true;}
+  try{
+    if(mode==='local'&&action==='answer')window.JengaAnswers.recordLocal(state,payload.response);
+    apply(mode==='local'?localAction(action,payload):await rpc(action,payload));
+    if(mode==='online'&&action==='answer')window.JengaAnswers.savedOnline();
+    return true;
+  }
   catch(e){error(e.message);if(mode==='online')healthy=false;return false;}
   finally{busy=false;render();}
 }
@@ -115,7 +124,7 @@ function startLocal(){
   if(names.length<2||names.length>30||names.some(s=>s.length>30)){error('Ingresa entre 2 y 30 alias, de hasta 30 caracteres cada uno.');return;}
   if(new Set(names.map(s=>s.toLocaleLowerCase())).size!==names.length){error('Usa un alias diferente para cada participante.');return;}
   clearInterval(timer);mode='local';token=null;config=null;lastRevision=-1;
-  apply({code:'LOCAL',revision:0,status:'playing',players:names.map((name,seat)=>({id:String(seat),name,seat})),selfId:'0',isHost:true,activeId:'0',selectedId:null,answered:false,revealed:false,turn:0,moves:[]});error('');
+  apply({code:'LOCAL',sessionId:crypto.randomUUID(),round:1,revision:0,status:'playing',players:names.map((name,seat)=>({id:String(seat),name,seat})),selfId:'0',isHost:true,activeId:'0',selectedId:null,answered:false,revealed:false,turn:0,moves:[]});error('');
 }
 $('roomMode').addEventListener('change',()=>{$('localSetup').hidden=$('roomMode').value!=='local';$('onlineSetup').hidden=$('roomMode').value!=='online';});
 $('createRoom').addEventListener('click',()=>connect('create'));$('joinRoom').addEventListener('click',()=>connect('join'));

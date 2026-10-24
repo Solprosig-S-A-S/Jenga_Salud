@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Respuestas · SOLPROSIG</title>
+<style>
+*{box-sizing:border-box}body{font:16px/1.5 system-ui;margin:0;background:#edf5ef;color:#183f36}main{max-width:1100px;margin:40px auto;padding:24px}section{background:white;padding:26px;border-radius:20px;margin-bottom:20px}h1{margin-top:0;font-size:28px}label{display:block;margin:12px 0 5px}input,button{font:inherit;border-radius:9px;padding:11px;border:1px solid #b7d2c4}input{width:100%;max-width:420px;display:block}button{background:#087c78;color:white;cursor:pointer;margin:14px 8px 0 0}button:disabled{opacity:.5;cursor:wait}a{color:#07565b}.filters{display:flex;flex-wrap:wrap;gap:16px}.filters input{width:190px}.scroll{overflow:auto;max-height:65vh}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:10px;text-align:left;border-bottom:1px solid #dce8dd;vertical-align:top;min-width:110px;white-space:pre-wrap;overflow-wrap:anywhere}td:last-child{min-width:250px}#status{min-height:24px;white-space:pre-wrap}[hidden]{display:none!important}
+</style></head><body><main>
+<a href="index.html">← Volver al juego</a><section><h1>Respuestas del juego</h1><p>Acceso exclusivo para administradores autorizados.</p>
+<form id="login"><label for="email">Correo</label><input id="email" type="email" autocomplete="username" required><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" required><button id="signIn">Ingresar</button></form>
+<div id="account" hidden><span id="identity"></span> <button id="signOut" type="button">Cerrar sesión</button></div><p id="status" role="status" aria-live="polite"></p></section>
+<section id="reports" hidden><h2>Descargar respuestas</h2><div class="filters"><div><label for="from">Desde (fecha UTC)</label><input id="from" type="date"></div><div><label for="to">Hasta (fecha UTC)</label><input id="to" type="date"></div><div><label for="alias">Alias exacto (opcional)</label><input id="alias" maxlength="30"></div></div>
+<button id="load" type="button">Consultar</button><button id="download" type="button" disabled>Descargar Excel (.xlsx)</button><p id="count"></p><div class="scroll"><table><thead><tr><th>Fecha (UTC)</th><th>Alias</th><th>Sala / modo</th><th>Pregunta</th><th>Respuesta</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+</main><script>window.JENGA_PROJECT={"url": "https://twemynxvrjlpgmrodopb.supabase.co", "key": "sb_publishable_f7M1t776wAexh5JTbcc6Yw_2UMJisyx"};
+// OOXML con cadenas explícitas: las respuestas nunca se interpretan como fórmulas.
+(function(){
+'use strict';
+const encoder=new TextEncoder();
+const xml=value=>String(value).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+function column(index){let result='';for(index++;index;index=Math.floor((index-1)/26))result=String.fromCharCode(65+(index-1)%26)+result;return result;}
+const table=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=(n&1)?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
+function crc(bytes){let n=0xffffffff;for(const b of bytes)n=table[(n^b)&255]^(n>>>8);return (n^0xffffffff)>>>0;}
+function zip(files){
+ const parts=[],directory=[];let offset=0,size=0;
+ for(const [name,content] of Object.entries(files)){
+  const filename=encoder.encode(name),data=encoder.encode(content),checksum=crc(data),local=new Uint8Array(30),lv=new DataView(local.buffer);
+  lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint32(14,checksum,true);lv.setUint32(18,data.length,true);lv.setUint32(22,data.length,true);lv.setUint16(26,filename.length,true);
+  parts.push(local,filename,data);
+  const central=new Uint8Array(46),cv=new DataView(central.buffer);
+  cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint32(16,checksum,true);cv.setUint32(20,data.length,true);cv.setUint32(24,data.length,true);cv.setUint16(28,filename.length,true);cv.setUint32(42,offset,true);
+  directory.push(central,filename);size+=central.length+filename.length;offset+=local.length+filename.length+data.length;
+ }
+ const end=new Uint8Array(22),view=new DataView(end.buffer),count=Object.keys(files).length;
+ view.setUint32(0,0x06054b50,true);view.setUint16(8,count,true);view.setUint16(10,count,true);view.setUint32(12,size,true);view.setUint32(16,offset,true);
+ return new Blob([...parts,...directory,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+window.JengaXlsx=rows=>{
+ if(rows.length>1048576)throw new Error('La consulta supera el límite de filas de Excel. Filtra por fechas.');
+ const sheet=rows.map((row,i)=>'<row r="'+(i+1)+'">'+row.map((value,j)=>'<c r="'+column(j)+(i+1)+'" t="inlineStr"><is><t xml:space="preserve">'+xml(value)+'</t></is></c>').join('')+'</row>').join('');
+ return zip({
+  '[Content_Types].xml':'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>',
+  '_rels/.rels':'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+  'xl/workbook.xml':'<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Respuestas" sheetId="1" r:id="rId1"/></sheets></workbook>',
+  'xl/_rels/workbook.xml.rels':'<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
+  'xl/worksheets/sheet1.xml':'<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" state="frozen"/></sheetView></sheetViews><sheetData>'+sheet+'</sheetData><autoFilter ref="A1:'+column(rows[0].length-1)+rows.length+'"/></worksheet>'
+ });
+};
+})();
+
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),config=window.JENGA_PROJECT;
+let token=null,rows=[],loading=false,generation=0;
+function status(message){$('status').textContent=message;}
+function clear(){rows=[];$('rows').replaceChildren();$('count').textContent='';$('download').disabled=true;}
+function lock(){generation++;token=null;clear();$('reports').hidden=true;$('account').hidden=true;$('login').hidden=false;}
+async function request(path,options={},bearer=token){
+ const res=await fetch(config.url+path,{...options,headers:{apikey:config.key,'Content-Type':'application/json',...(bearer?{Authorization:'Bearer '+bearer}:{}),...options.headers},signal:AbortSignal.timeout(20000)});
+ const body=await res.json().catch(()=>({}));
+ if(!res.ok){if(res.status===401&&token){lock();throw new Error('Tu sesión venció. Vuelve a ingresar.');}throw new Error(path.startsWith('/auth/')?'No se pudo iniciar sesión. Revisa tu correo y contraseña.':body.code==='PGRST202'?'Falta instalar supabase/admin.sql.':'No se pudo consultar. Verifica tu conexión y tus permisos.');}
+ return body;
+}
+$('login').addEventListener('submit',async event=>{
+ event.preventDefault();$('signIn').disabled=true;status('Verificando acceso…');
+ try{
+  const auth=await request('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('email').value.trim(),password:$('password').value})},null);
+  token=auth.access_token;$('password').value='';
+  const allowed=await request('/rest/v1/rpc/jenga_is_admin',{method:'POST',body:'{}'});
+  if(allowed!==true){lock();throw new Error('Esta cuenta no tiene acceso de administrador.');}
+  $('identity').textContent=auth.user.email;$('login').hidden=true;$('account').hidden=false;$('reports').hidden=false;status('Acceso autorizado. Consulta las respuestas para descargar.');
+ }catch(e){lock();status(e.message);}finally{$('signIn').disabled=false;}
+});
+$('signOut').addEventListener('click',()=>{
+ const previous=token;lock();status('Sesión cerrada.');
+ void request('/auth/v1/logout',{method:'POST'},previous).catch(()=>{});
+});
+async function load(){
+ if(!token||loading)return;
+ clear();
+ if($('from').value&&$('to').value&&$('from').value>$('to').value){status('La fecha inicial debe ser anterior a la final.');return;}
+ loading=true;$('load').disabled=true;for(const id of ['from','to','alias'])$(id).disabled=true;const current=generation;status('Consultando…');
+ try{
+  const snapshot=await request('/rest/v1/rpc/jenga_answers_snapshot',{method:'POST',body:'{}'});
+  const base=new URLSearchParams({select:'*',order:'id.asc',limit:'1000',id:'lte.'+snapshot});
+  if($('from').value)base.append('created_at','gte.'+$('from').value+'T00:00:00Z');
+  if($('to').value){const end=new Date($('to').value+'T00:00:00Z');end.setUTCDate(end.getUTCDate()+1);base.append('created_at','lt.'+end.toISOString());}
+  if($('alias').value.trim())base.set('alias','eq.'+$('alias').value.trim());
+  let cursor=0;const result=[];
+  while(true){
+   const query=new URLSearchParams(base);query.append('id','gt.'+cursor);
+   const batch=await request('/rest/v1/jenga_answers?'+query);
+   if(current!==generation)return;
+   if(!Array.isArray(batch))throw new Error('Respuesta de consulta inválida.');
+   if(!batch.length)break;
+   result.push(...batch);cursor=batch.at(-1).id;
+  }
+  rows=result;
+  for(const row of rows.slice(0,100)){
+   const tr=document.createElement('tr');
+   for(const value of [row.created_at,row.alias,row.room_code||'Local',row.question,row.response]){const td=document.createElement('td');td.textContent=value;tr.appendChild(td);}
+   $('rows').appendChild(tr);
+  }
+  $('count').textContent=rows.length+' respuestas. Vista previa: hasta 100 filas. El Excel incluye todas las respuestas consultadas.';
+  $('download').disabled=!rows.length;status(rows.length?'Consulta lista. Puedes descargar el Excel.':'No hay respuestas para estos filtros.');
+ }catch(e){clear();status(e.message);}finally{loading=false;$('load').disabled=false;for(const id of ['from','to','alias'])$(id).disabled=false;}
+}
+$('load').addEventListener('click',load);
+for(const id of ['from','to','alias'])$(id).addEventListener('input',()=>{clear();status('Filtros modificados. Pulsa Consultar.');});
+$('download').addEventListener('click',()=>{
+ if(!rows.length||!token)return;
+ const values=[['ID','Fecha de registro (UTC)','Alias','Modo','Sala','Sesión local','Ronda','Turno','Pieza','Pregunta #','Pregunta','Respuesta'],...rows.map(r=>[r.id,r.created_at,r.alias,r.mode,r.room_code||'',r.local_session||'',r.round_no,r.turn_no+1,r.block_id,r.question_no,r.question,r.response])];
+ const blob=window.JengaXlsx(values),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='respuestas-jenga-'+new Date().toISOString().slice(0,10)+'.xlsx';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+})();
+</script></body></html>
