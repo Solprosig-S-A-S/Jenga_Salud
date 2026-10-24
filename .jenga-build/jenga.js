@@ -5,15 +5,16 @@ let scene,camera,renderer,world,blocks=[],selected=null,phase='ready',motion=nul
 let azimuth=.72,elevation=.24,radius=24,drag=null;
 let appliedMoves=[],roomCode=null,pendingCanonical=null;
 let cameraCue=null,cameraZoom=1,cameraTargetY=5.5,entranceTime=0;
+let suggestedColor=null;
 
-// Giant Jenga 6 corporate colors matching the giant company set & physical dice
+// 6 corporate pastel colors matching the giant company set & physical dice
 const JENGA_COLORS = [
-  { id: 'rosa', name: 'Rosa', hex: '#ff2d75', text: '#ffffff', emissive: 0xff4081 },
-  { id: 'azul', name: 'Azul', hex: '#1976d2', text: '#ffffff', emissive: 0x42a5f5 },
-  { id: 'turquesa', name: 'Turquesa', hex: '#00bfa5', text: '#ffffff', emissive: 0x26a69a },
-  { id: 'lima', name: 'Verde lima', hex: '#76ff03', text: '#153d08', emissive: 0x76ff03 },
-  { id: 'morado', name: 'Morado', hex: '#8e24aa', text: '#ffffff', emissive: 0xab47bc },
-  { id: 'amarillo', name: 'Amarillo', hex: '#ffd600', text: '#2c1e02', emissive: 0xffea00 }
+  { id: 'rosa', name: 'Rosa pastel', hex: '#f8a5c2', text: '#5e1a2b', emissive: 0xf8a5c2 },
+  { id: 'azul', name: 'Azul pastel', hex: '#a0c4ff', text: '#15325b', emissive: 0xa0c4ff },
+  { id: 'turquesa', name: 'Turquesa pastel', hex: '#7fd8be', text: '#124335', emissive: 0x7fd8be },
+  { id: 'lima', name: 'Verde lima pastel', hex: '#b8e994', text: '#284d14', emissive: 0xb8e994 },
+  { id: 'morado', name: 'Morado pastel', hex: '#d1b2ff', text: '#3b255c', emissive: 0xd1b2ff },
+  { id: 'amarillo', name: 'Amarillo pastel', hex: '#ffeaa7', text: '#544310', emissive: 0xffeaa7 }
 ];
 window.JENGA_COLORS = JENGA_COLORS;
 
@@ -23,12 +24,12 @@ let diceStartPos = null, diceTargetPos = null, diceTargetQuat = null, diceSpinAx
 const DICE_SIZE = 1.85;
 const DICE_REST_POS = new THREE.Vector3(3.4, 0.95, 2.8);
 const DICE_FACE_NORMALS = [
-  new THREE.Vector3(1, 0, 0),   // 0: +X Rosa
-  new THREE.Vector3(-1, 0, 0),  // 1: -X Azul
-  new THREE.Vector3(0, 1, 0),   // 2: +Y Turquesa
-  new THREE.Vector3(0, -1, 0),  // 3: -Y Verde lima
-  new THREE.Vector3(0, 0, 1),   // 4: +Z Morado
-  new THREE.Vector3(0, 0, -1)   // 5: -Z Amarillo
+  new THREE.Vector3(1, 0, 0),   // 0: +X Rosa pastel
+  new THREE.Vector3(-1, 0, 0),  // 1: -X Azul pastel
+  new THREE.Vector3(0, 1, 0),   // 2: +Y Turquesa pastel
+  new THREE.Vector3(0, -1, 0),  // 3: -Y Verde lima pastel
+  new THREE.Vector3(0, 0, 1),   // 4: +Z Morado pastel
+  new THREE.Vector3(0, 0, -1)   // 5: -Z Amarillo pastel
 ];
 
 const animations=()=>window.JengaMotion;
@@ -54,14 +55,16 @@ function controls(){
 
 function options(){
  const list=$('blockPicker');
- list.replaceChildren(new Option('Seleccionar una pieza…',''));
+ list.replaceChildren(new Option('Seleccionar un bloque…',''));
  eligible().sort((a,b)=>a.id-b.id).forEach(b=>{
-   list.add(new Option('#'+b.id+' · '+b.color.name+' (nivel '+(b.level+1)+')',String(b.id)));
+   const pos = b.slot === 0 ? 'lateral' : b.slot === 1 ? 'centro' : 'lateral';
+   list.add(new Option(b.color.name + ' · Nivel ' + (b.level+1) + ' (' + pos + ')', String(b.id)));
  });
 }
 
 function select(b){
  if(!b)return;
+ suggestedColor = null;
  if(selected?.id!==b.id&&animations()?.enabled()&&!animations().paused()){
    const goal=(b.level%2?Math.PI:Math.PI/2)+.22;
    const angle=((goal-azimuth+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
@@ -69,9 +72,9 @@ function select(b){
  }
  selected=b;$('blockPicker').value=String(b.id);
  window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
- $('pieceInstruction').textContent='Saca la pieza #'+b.id+' ('+b.color.name+')';
- $('pieceDetail').textContent='Color '+b.color.name+' · Nivel '+(b.level+1)+' · posición '+(b.slot+1)+'/3';
- status('Pieza asignada ('+b.color.name+'). Responde su pregunta antes de confirmar la retirada.');
+ $('pieceInstruction').textContent='Bloque ' + b.color.name;
+ $('pieceDetail').textContent='Nivel ' + (b.level+1) + ' · posición ' + (b.slot===0?'lateral':b.slot===1?'centro':'lateral') + ' (3 en fila)';
+ status('Bloque ' + b.color.name + ' seleccionado. Responde la pregunta antes de confirmar la retirada.');
  controls();
 }
 
@@ -89,11 +92,11 @@ function createDiceFaceTexture(color){
  const cx=256,cy=256,r=172;
  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=color.hex;ctx.shadowColor='rgba(0,0,0,0.55)';ctx.shadowBlur=18;ctx.fill();ctx.shadowBlur=0;
  const grad=ctx.createRadialGradient(cx-35,cy-35,25,cx,cy,r);
- grad.addColorStop(0,'rgba(255,255,255,0.28)');grad.addColorStop(0.65,'rgba(255,255,255,0.0)');grad.addColorStop(1,'rgba(0,0,0,0.22)');
+ grad.addColorStop(0,'rgba(255,255,255,0.35)');grad.addColorStop(0.65,'rgba(255,255,255,0.0)');grad.addColorStop(1,'rgba(0,0,0,0.18)');
  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='rgba(255,255,255,0.7)';ctx.lineWidth=5;ctx.setLineDash([16,12]);
+ ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=5;ctx.setLineDash([16,12]);
  ctx.beginPath();ctx.arc(cx,cy,r-8,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
- ctx.strokeStyle='rgba(0,0,0,0.35)';ctx.lineWidth=2;
+ ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.lineWidth=2;
  ctx.beginPath();ctx.arc(cx,cy,r-13,0,Math.PI*2);ctx.stroke();
  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return tex;
 }
@@ -101,7 +104,7 @@ function createDiceFaceTexture(color){
 function initDice(){
  if(diceMesh)return;
  const geom=new THREE.BoxGeometry(DICE_SIZE,DICE_SIZE,DICE_SIZE);
- const materials=JENGA_COLORS.map(c=>new THREE.MeshStandardMaterial({map:createDiceFaceTexture(c),roughness:0.58,metalness:0.05}));
+ const materials=JENGA_COLORS.map(c=>new THREE.MeshStandardMaterial({map:createDiceFaceTexture(c),roughness:0.55,metalness:0.02}));
  diceMesh=new THREE.Mesh(geom,materials);
  diceMesh.castShadow=true;diceMesh.receiveShadow=true;
  diceMesh.position.copy(DICE_REST_POS);
@@ -157,22 +160,21 @@ function updateDice(dt){
  }
 }
 
-function rollAndChoose(specificColorIndex=null){
+function rollAndPrompt(specificColorIndex=null){
  if(phase!=='ready'||fallen||!session()?.can('draw')||diceRolling)return;
  const choices=eligible();
  if(!choices.length){status('No quedan piezas disponibles bajo los dos niveles superiores. Reconstruye la torre.');return;}
  let targetColor=specificColorIndex;
- let candidates=[];
- if(targetColor!==null&&targetColor!==undefined){candidates=choices.filter(b=>b.colorIndex===targetColor);}
- if(!candidates.length){
+ if(targetColor===null||targetColor===undefined){
    const availableColors=[...new Set(choices.map(b=>b.colorIndex))];
    targetColor=availableColors[Math.floor(Math.random()*availableColors.length)];
-   candidates=choices.filter(b=>b.colorIndex===targetColor);
  }
- const chosenBlock=candidates[Math.floor(Math.random()*candidates.length)];
+ const color=JENGA_COLORS[targetColor];
  rollDice(targetColor,()=>{
-   choose(chosenBlock);
-   status('🎲 ¡Salió '+chosenBlock.color.name.toUpperCase()+'! Saca la pieza #'+chosenBlock.id+' en la torre.');
+   suggestedColor=targetColor;
+   $('pieceInstruction').textContent='Elige tu bloque ' + color.name;
+   $('pieceDetail').textContent='Toca en la torre 3D el bloque ' + color.name + ' que quieras retirar.';
+   status('🎲 ¡Salió ' + color.name.toUpperCase() + '! Toca en la torre el bloque que prefieras sacar.');
  });
 }
 
@@ -182,8 +184,8 @@ function canonical(moves){
  blocks.forEach(b=>{b.level=Math.floor((b.id-1)/3);b.slot=(b.id-1)%3;});
  moves.forEach((id,index)=>{const b=blocks.find(b=>b.id===id);if(b){b.level=18+Math.floor(index/3);b.slot=index%3;}});
  blocks.forEach(b=>{const pos=(b.slot-1)*(W+GAP);b.homeY=H/2+b.level*STEP;b.body.type=CANNON.Body.DYNAMIC;b.body.material=wood;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(b.level%2?pos:0,b.homeY,b.level%2?0:pos);b.body.quaternion.setFromEuler(0,b.level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();});
- topSlots=moves.length;turn=moves.length;appliedMoves=[...moves];fallen=false;motion=null;selected=null;phase='settling';elapsed=0;
- $('towerTurns').textContent=turn+(turn===1?' pieza retirada':' piezas retiradas');options();controls();
+ topSlots=moves.length;turn=moves.length;appliedMoves=[...moves];fallen=false;motion=null;selected=null;suggestedColor=null;phase='settling';elapsed=0;
+ $('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');options();controls();
 }
 
 function roomUpdate(next,previous){
@@ -224,23 +226,16 @@ function animateCamera(dt,time){
  cameraTargetY+=(target-cameraTargetY)*Math.min(1,dt*2.5);aim();
 }
 
+// Blocks without visual numbers: clean, realistic pastel foam/fabric cushion blocks!
 function texture(id,end=false){
- const c=document.createElement('canvas');c.width=end?256:512;c.height=128;const ctx=c.getContext('2d');
+ const c=document.createElement('canvas');c.width=end?160:384;c.height=128;const ctx=c.getContext('2d');
  const color=JENGA_COLORS[(id-1)%JENGA_COLORS.length];
  ctx.fillStyle=color.hex;ctx.fillRect(0,0,c.width,128);
  const grad=ctx.createLinearGradient(0,0,0,128);
- grad.addColorStop(0,'rgba(255,255,255,0.26)');grad.addColorStop(0.12,'rgba(255,255,255,0.06)');grad.addColorStop(0.85,'rgba(0,0,0,0.02)');grad.addColorStop(1,'rgba(0,0,0,0.22)');
+ grad.addColorStop(0,'rgba(255,255,255,0.42)');grad.addColorStop(0.18,'rgba(255,255,255,0.12)');grad.addColorStop(0.82,'rgba(0,0,0,0.02)');grad.addColorStop(1,'rgba(0,0,0,0.18)');
  ctx.fillStyle=grad;ctx.fillRect(0,0,c.width,128);
- ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.lineWidth=2;ctx.strokeRect(4,4,c.width-8,120);
- ctx.shadowColor='rgba(0,0,0,0.35)';ctx.shadowBlur=6;ctx.shadowOffsetY=2;
- ctx.fillStyle=color.text;
- if(end){
-   ctx.font='bold 62px system-ui, -apple-system, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillText(String(id).padStart(2,'0'),128,65);
- }else{
-   ctx.font='bold 44px system-ui, -apple-system, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillText(String(id).padStart(2,'0')+' · '+color.name.toUpperCase(),256,64);
- }
+ ctx.strokeStyle='rgba(0,0,0,0.10)';ctx.lineWidth=3;ctx.strokeRect(3,3,c.width-6,122);
+ ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1.5;ctx.strokeRect(6,6,c.width-12,116);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;
 }
 
@@ -248,7 +243,7 @@ function init(){
  if(started)return;started=true;
  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});}catch(e){host.textContent='No se pudo iniciar la vista 3D. Puedes seguir usando las instrucciones y los retos.';status('Vista 3D no disponible en este navegador.');$('drawBlock').disabled=true;$('confirmBlock').disabled=true;return;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0xeaf0eb);host.appendChild(renderer.domElement);
- renderer.domElement.setAttribute('aria-label','Torre Jenga 3D y dado gigante. Arrastra para girar; tira el dado o usa el selector.');
+ renderer.domElement.setAttribute('aria-label','Torre Jenga 3D de colores pastel. Arrastra para girar; toca directamente el bloque que vas a sacar o tira el dado gigante.');
  scene=new THREE.Scene();scene.fog=new THREE.Fog(0xeaf0eb,35,65);camera=new THREE.PerspectiveCamera(39,1,.1,100);aim();
  scene.add(new THREE.HemisphereLight(0xfff6e3,0x637967,1.8));
  const light=new THREE.DirectionalLight(0xfff1d9,2);light.position.set(7,16,8);light.castShadow=true;light.shadow.mapSize.set(2048,2048);Object.assign(light.shadow.camera,{left:-12,right:12,top:15,bottom:-12});light.shadow.normalBias=.025;scene.add(light);
@@ -270,8 +265,12 @@ function init(){
      const hitList=diceMesh?[diceMesh,...blocks.map(b=>b.mesh)]:blocks.map(b=>b.mesh);
      const hits=ray.intersectObjects(hitList);
      if(hits.length){
-       if(hits[0].object===diceMesh)rollAndChoose();
-       else if(hits[0].object.userData.block)choose(hits[0].object.userData.block);
+       if(hits[0].object===diceMesh){
+         rollAndPrompt();
+       }else if(hits[0].object.userData.block){
+         // Simply select whichever block the player touches on the tower!
+         choose(hits[0].object.userData.block);
+       }
      }
    }
    drag=null;
@@ -284,7 +283,7 @@ function resize(){if(!renderer||!host.clientWidth)return;const w=host.clientWidt
 
 function reset(){
  if(!world)return;
- entranceTime=0;cameraCue=null;
+ entranceTime=0;cameraCue=null;suggestedColor=null;
  window.dispatchEvent(new Event('jenga-board-reset'));
  blocks.forEach(b=>{world.removeBody(b.body);scene.remove(b.mesh);b.mesh.geometry.dispose();new Set(b.mesh.material).forEach(m=>{m.map.dispose();m.dispose();});});
  blocks=[];selected=null;motion=null;turn=0;topSlots=0;fallen=false;elapsed=0;phase='settling';
@@ -295,24 +294,24 @@ function reset(){
    const color=JENGA_COLORS[colorIndex];
    const body=new CANNON.Body({mass:.3,material:wood,shape:new CANNON.Box(new CANNON.Vec3(L/2,H/2,W/2)),linearDamping:.18,angularDamping:.35,sleepSpeedLimit:.06,sleepTimeLimit:1});
    body.position.set(level%2?pos:0,y,level%2?0:pos);body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);world.addBody(body);
-   const longMat=new THREE.MeshStandardMaterial({map:texture(id),roughness:.58,color:0xffffff});
-   const endMat=new THREE.MeshStandardMaterial({map:texture(id,true),roughness:.65,color:0xffffff});
+   const longMat=new THREE.MeshStandardMaterial({map:texture(id),roughness:.55,color:0xffffff});
+   const endMat=new THREE.MeshStandardMaterial({map:texture(id,true),roughness:.62,color:0xffffff});
    const mesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),[endMat,endMat,longMat,longMat,longMat,longMat]);
    mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);
    const b={id,level,slot,body,mesh,homeY:y,color,colorIndex};mesh.userData.block=b;blocks.push(b);
  }
- $('pieceInstruction').textContent='¿Qué color saldrá?';
- $('pieceDetail').textContent='Tira el dado gigante 3D o elige una pieza. Los niveles se cuentan desde la base.';
- $('towerTurns').textContent='0 piezas retiradas';
- status('El Jenga de colores está listo…');options();controls();
+ $('pieceInstruction').textContent='Toca un bloque o tira el dado';
+ $('pieceDetail').textContent='Elige directamente en la torre 3D el bloque que vas a sacar.';
+ $('towerTurns').textContent='0 bloques retirados';
+ status('La torre de colores pastel está lista. Toca cualquier bloque para comenzar.');options();controls();
 }
 
-function extract(){if(!selected||phase!=='ready'||fallen)return;window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();motion={b,origin:b.body.position.clone(),dir};b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));world.bodies.forEach(x=>x.wakeUp());status('Retirando #'+b.id+' ('+b.color.name+') · la torre está buscando su equilibrio…');controls();}
+function extract(){if(!selected||phase!=='ready'||fallen)return;window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();motion={b,origin:b.body.position.clone(),dir};b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));world.bodies.forEach(x=>x.wakeUp());status('Retirando bloque ' + b.color.name + ' · la torre busca su equilibrio…');controls();}
 
 function place(){const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
- b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();topSlots++;turn++;$('towerTurns').textContent=turn+(turn===1?' pieza retirada':' piezas retiradas');phase='settling';elapsed=0;selected=null;motion=null;status('Pieza '+b.color.name+' colocada arriba. Esperando a que la torre se estabilice…');}
+ b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();topSlots++;turn++;$('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');phase='settling';elapsed=0;selected=null;suggestedColor=null;motion=null;status('Bloque ' + b.color.name + ' colocado arriba. Esperando estabilización…');}
 
-function collapse(){fallen=true;phase='fallen';selected=null;if(motion){motion.b.body.material=wood;motion.b.body.type=CANNON.Body.DYNAMIC;motion.b.body.updateMassProperties();motion.b.body.wakeUp();}motion=null;status('La torre virtual cayó. Si la torre real sigue en pie, puedes reconstruir la simulación.');$('pieceInstruction').textContent='¡La torre perdió el equilibrio!';$('pieceDetail').textContent='Reconstruye la torre para comenzar otra ronda.';controls();}
+function collapse(){fallen=true;phase='fallen';selected=null;suggestedColor=null;if(motion){motion.b.body.material=wood;motion.b.body.type=CANNON.Body.DYNAMIC;motion.b.body.updateMassProperties();motion.b.body.wakeUp();}motion=null;status('La torre virtual cayó. Si la torre real sigue en pie, puedes reconstruir la simulación.');$('pieceInstruction').textContent='¡La torre perdió el equilibrio!';$('pieceDetail').textContent='Reconstruye la torre para comenzar otra ronda.';controls();}
 
 function update(dt){
  elapsed+=dt;entranceTime=animations()?.enabled()?entranceTime+dt:2;
@@ -322,7 +321,7 @@ function update(dt){
    b.body.velocity.copy(dir.scale(.55));
    const offset=b.body.position.vsub(origin).dot(dir);
    if(offset>3.35){b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.velocity.setZero();b.body.angularVelocity.setZero();phase='lifting';elapsed=0;motion.liftStart=b.body.position.clone();}
-   else if(elapsed>12){b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.updateMassProperties();b.body.velocity.setZero();phase='ready';motion=null;status('Prueba otra pieza o vuelve a intentarlo.');controls();}
+   else if(elapsed>12){b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.updateMassProperties();b.body.velocity.setZero();phase='ready';motion=null;status('Prueba otro bloque o vuelve a intentarlo.');controls();}
  }else if(phase==='lifting'){
    const b=motion.b,t=Math.min(elapsed/2,1),rise=Math.min(t/.65,1),slide=Math.max(0,(t-.65)/.35),s=slide*slide*(3-2*slide),y=Math.max(...blocks.filter(x=>x!==b).map(x=>x.body.position.y))+1.3;
    b.body.position.set(motion.liftStart.x*(1-s),motion.liftStart.y+(y-motion.liftStart.y)*rise,motion.liftStart.z*(1-s));b.body.aabbNeedsUpdate=true;
@@ -336,14 +335,25 @@ function update(dt){
    if(pendingCanonical&&session()?.isOnline()){const moves=pendingCanonical;canonical(moves);return;}
    pendingCanonical=null;phase='ready';options();
    const nextId=session()?.getState()?.selectedId;if(nextId)select(blocks.find(b=>b.id===nextId));
-   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();status('Torre lista. Continúa siguiendo el orden de turnos.');
+   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();status('Torre lista. Elige directamente en la torre el bloque que vas a sacar.');
  }
+ const now = performance.now();
  blocks.forEach(b=>{
    b.mesh.position.copy(b.body.position);b.mesh.quaternion.copy(b.body.quaternion);
    if(animations()?.enabled()&&entranceTime<1.6){const t=Math.max(0,Math.min(1,(entranceTime-b.level*.025-b.slot*.02)/.65));b.mesh.position.y+=(2+b.level*.08)*Math.pow(1-t,3);}
+   const isSel = b === selected;
+   const isSugg = suggestedColor !== null && b.colorIndex === suggestedColor && !selected;
    b.mesh.material.forEach(m=>{
-     m.emissive.setHex(b===selected?b.color.emissive:0x000000);
-     m.emissiveIntensity=b===selected?(animations()?.enabled()?.55+.25*Math.sin(performance.now()*.006):.6):0;
+     if(isSel){
+       m.emissive.setHex(b.color.emissive);
+       m.emissiveIntensity=animations()?.enabled()?.55+.25*Math.sin(now*.006):.6;
+     }else if(isSugg){
+       m.emissive.setHex(b.color.emissive);
+       m.emissiveIntensity=animations()?.enabled()?.28+.15*Math.sin(now*.005):.3;
+     }else{
+       m.emissive.setHex(0x000000);
+       m.emissiveIntensity=0;
+     }
    });
  });
 }
@@ -356,12 +366,12 @@ function frame(time){
  }
 }
 
-$('drawBlock').addEventListener('click',()=>rollAndChoose());
+$('drawBlock').addEventListener('click',()=>rollAndPrompt());
 document.querySelectorAll('.dice-color-btn').forEach(btn=>{
  btn.addEventListener('click',e=>{
    e.stopPropagation();
    const colorIndex=Number(btn.dataset.color);
-   rollAndChoose(colorIndex);
+   rollAndPrompt(colorIndex);
  });
 });
 $('blockPicker').addEventListener('change',e=>{const b=blocks.find(b=>b.id===Number(e.target.value));if(b)choose(b);});

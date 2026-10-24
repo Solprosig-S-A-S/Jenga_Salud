@@ -45,8 +45,8 @@ function render(){
  const written=$('playerResponse').value.trim();
  $('responseEcho').hidden=!mine||!chosen||!state?.answered||!written;
  if(!$('responseEcho').hidden)$('responseEcho').textContent='Tu respuesta: '+written;
- $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Tira el dado gigante o elige el número de tu pieza.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
- if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu pieza':'responde el reto'):'elige una pieza'):'Es el turno de '+active+'.';
+ $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Tira el dado gigante o toca en la torre el bloque que vas a sacar.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
+ if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu bloque':'responde el reto'):'tira el dado o toca un bloque'):'Es el turno de '+active+'.';
  if(chosen&&lastPiece!==state.selectedId){
   document.body.classList.remove('tower-expanded');$('questionPanel').scrollTop=0;
   effect($('challengeQuestion'),[{opacity:.2,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],420);
