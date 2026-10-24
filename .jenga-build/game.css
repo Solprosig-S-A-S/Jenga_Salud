@@ -20,3 +20,20 @@
 .dice-color-btn:hover{filter:brightness(1.08);transform:scale(1.03)}
 .dice-color-btn:active{transform:scale(.97)}
 .manual-choice>div{width:260px}
+
+.dice-color-section{margin:0 0 12px;padding:12px 14px;background:#f4f9f5;border:1px solid #d0e4d7;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.dice-color-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.dice-color-title{font-size:12px;font-weight:900;color:#184a3c;letter-spacing:-.01em}
+.btn-dice-subtle{border:none;background:transparent;color:#087c78;font-size:11px;font-weight:800;cursor:pointer;padding:3px 6px;border-radius:6px;text-decoration:underline}
+.btn-dice-subtle:hover{background:#e2f0e8}
+.dice-color-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media(max-width:520px){.dice-color-grid{grid-template-columns:repeat(3,1fr)}}
+.dice-color-btn{border:2px solid transparent;border-radius:10px;padding:9px 4px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 4px rgba(0,0,0,.10);transition:transform .12s,border-color .12s,box-shadow .12s}
+.dice-color-btn:hover{transform:scale(1.04);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.dice-color-btn.is-active{border-color:#163f30!important;box-shadow:0 0 0 2px #fff, 0 3px 10px rgba(0,0,0,.25)!important;transform:scale(1.05)}
+.color-block-chips{margin-top:10px;padding-top:10px;border-top:1px dashed #c6ded0}
+.chips-title{font-size:11px;font-weight:850;color:#235645;display:block;margin-bottom:6px}
+.chips-container{display:flex;flex-wrap:wrap;gap:6px}
+.chip-btn{border:1px solid #bdd7c8;background:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:#18473a;cursor:pointer;transition:background .12s,border-color .12s,transform .12s}
+.chip-btn:hover{background:#e7f3ec;border-color:#087c78;transform:scale(1.03)}
+.chip-btn:active{transform:scale(.97)}

@@ -53,18 +53,45 @@ function controls(){
  });
 }
 
+function updateColorChips(colorIndex){
+ const wrap=$('colorBlockChips'), box=$('chipsContainer'), title=$('chipsTitle');
+ if(!wrap||!box)return;
+ if(colorIndex===null||colorIndex===undefined){wrap.hidden=true;box.replaceChildren();return;}
+ const color=JENGA_COLORS[colorIndex];
+ const avails=eligible().filter(b=>b.colorIndex===colorIndex).sort((a,b)=>a.level-b.level);
+ if(!avails.length){
+   wrap.hidden=false;
+   title.textContent='No quedan bloques '+color.name+' elegibles. Elige otro color:';
+   box.replaceChildren();
+   return;
+ }
+ wrap.hidden=false;
+ title.textContent='2. Toca en la torre o pulsa el bloque ' + color.name + ' que sacaron:';
+ box.replaceChildren();
+ avails.forEach(b=>{
+   const btn=document.createElement('button');btn.type='button';btn.className='chip-btn';
+   const pos=b.slot===0?'izq.':b.slot===1?'centro':'der.';
+   btn.textContent='Nivel '+(b.level+1)+' ('+pos+')';
+   btn.addEventListener('click',()=>choose(b));
+   box.appendChild(btn);
+ });
+}
+
 function options(){
  const list=$('blockPicker');
  list.replaceChildren(new Option('Seleccionar un bloque…',''));
  eligible().sort((a,b)=>a.id-b.id).forEach(b=>{
-   const pos = b.slot === 0 ? 'lateral' : b.slot === 1 ? 'centro' : 'lateral';
+   const pos = b.slot === 0 ? 'lateral izq.' : b.slot === 1 ? 'centro' : 'lateral der.';
    list.add(new Option(b.color.name + ' · Nivel ' + (b.level+1) + ' (' + pos + ')', String(b.id)));
  });
+ if(suggestedColor!==null)updateColorChips(suggestedColor);
 }
 
 function select(b){
  if(!b)return;
  suggestedColor = null;
+ updateColorChips(null);
+ document.querySelectorAll('.dice-color-btn').forEach(btn => btn.classList.remove('is-active'));
  if(selected?.id!==b.id&&animations()?.enabled()&&!animations().paused()){
    const goal=(b.level%2?Math.PI:Math.PI/2)+.22;
    const angle=((goal-azimuth+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
@@ -74,7 +101,7 @@ function select(b){
  window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
  $('pieceInstruction').textContent='Bloque ' + b.color.name;
  $('pieceDetail').textContent='Nivel ' + (b.level+1) + ' · posición ' + (b.slot===0?'lateral':b.slot===1?'centro':'lateral') + ' (3 en fila)';
- status('Bloque ' + b.color.name + ' seleccionado. Responde la pregunta antes de confirmar la retirada.');
+ status('Bloque ' + b.color.name + ' retirado. La torre se ordena arriba. Responde la pregunta para pasar el turno.');
  controls();
 }
 
@@ -110,6 +137,15 @@ function initDice(){
  diceMesh.position.copy(DICE_REST_POS);
  diceMesh.quaternion.setFromEuler(new THREE.Euler(0.2,0.4,0));
  scene.add(diceMesh);
+}
+
+function tiltDiceToColor(colorIndex){
+ if(!diceMesh||diceRolling)return;
+ const toCam=camera.position.clone().sub(DICE_REST_POS).normalize();
+ toCam.y=Math.max(0.42,toCam.y+0.2);toCam.normalize();
+ const normal=DICE_FACE_NORMALS[colorIndex];
+ const q=new THREE.Quaternion().setFromUnitVectors(normal,toCam);
+ diceMesh.quaternion.copy(q);
 }
 
 function rollDice(targetColorIndex,onComplete){
@@ -163,7 +199,7 @@ function updateDice(dt){
 function rollAndPrompt(specificColorIndex=null){
  if(phase!=='ready'||fallen||!session()?.can('draw')||diceRolling)return;
  const choices=eligible();
- if(!choices.length){status('No quedan piezas disponibles bajo los dos niveles superiores. Reconstruye la torre.');return;}
+ if(!choices.length){status('No quedan bloques disponibles bajo los dos niveles superiores. Reconstruye la torre.');return;}
  let targetColor=specificColorIndex;
  if(targetColor===null||targetColor===undefined){
    const availableColors=[...new Set(choices.map(b=>b.colorIndex))];
@@ -171,11 +207,22 @@ function rollAndPrompt(specificColorIndex=null){
  }
  const color=JENGA_COLORS[targetColor];
  rollDice(targetColor,()=>{
-   suggestedColor=targetColor;
-   $('pieceInstruction').textContent='Elige tu bloque ' + color.name;
-   $('pieceDetail').textContent='Toca en la torre 3D el bloque ' + color.name + ' que quieras retirar.';
-   status('🎲 ¡Salió ' + color.name.toUpperCase() + '! Toca en la torre el bloque que prefieras sacar.');
+   pickColor(targetColor);
+   status('🎲 ¡Salió ' + color.name.toUpperCase() + '! Toca en la torre el bloque que sacaron.');
  });
+}
+
+function pickColor(colorIndex){
+ suggestedColor=colorIndex;
+ tiltDiceToColor(colorIndex);
+ const color=JENGA_COLORS[colorIndex];
+ document.querySelectorAll('.dice-color-btn').forEach(btn=>{
+   btn.classList.toggle('is-active', Number(btn.dataset.color)===colorIndex);
+ });
+ updateColorChips(colorIndex);
+ $('pieceInstruction').textContent='Elige tu bloque ' + color.name;
+ $('pieceDetail').textContent='Toca en la torre 3D o pulsa abajo el bloque ' + color.name + ' que sacaron.';
+ status(color.name + ': toca en la torre el bloque que sacaron para que se ordene arriba.');
 }
 
 function canonical(moves){
@@ -199,12 +246,22 @@ function roomUpdate(next,previous){
  }else if(moves.length>appliedMoves.length){
    const added=moves.slice(appliedMoves.length);appliedMoves=[...moves];
    added.forEach(id=>window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id,completed:true}})));
-   if(added.length===1&&phase==='ready'&&!fallen){selected=blocks.find(b=>b.id===added[0]);pendingCanonical=moves;extract();}
-   else canonical(moves);
+   // If the block is already at the top or being animated, update canonical
+   if(added.length===1&&phase==='ready'&&!fallen&&(!selected||selected.id!==added[0])){
+     selected=blocks.find(b=>b.id===added[0]);pendingCanonical=moves;extract();
+   }else canonical(moves);
  }
  if(next.status==='lobby'&&previous?.status!=='lobby'){window.dispatchEvent(new Event('jenga-board-reset'));canonical([]);}
- if(next.selectedId!==null&&!motion)select(blocks.find(b=>b.id===next.selectedId));
- else if(!motion)selected=null;
+ if(next.selectedId!==null&&!motion){
+   const nextBlock=blocks.find(b=>b.id===next.selectedId);
+   if(nextBlock&&(!selected||selected.id!==nextBlock.id)){
+     select(nextBlock);
+     // "Cuando lo hacen, se ordena todo": animate extraction & placement immediately!
+     if(phase==='ready'&&!fallen)extract();
+   }
+ }else if(!motion&&next.selectedId===null){
+   selected=null;
+ }
  window.dispatchEvent(new CustomEvent('jenga-answer-state',{detail:{revealed:next.revealed}}));
  controls();
 }
@@ -283,7 +340,7 @@ function resize(){if(!renderer||!host.clientWidth)return;const w=host.clientWidt
 
 function reset(){
  if(!world)return;
- entranceTime=0;cameraCue=null;suggestedColor=null;
+ entranceTime=0;cameraCue=null;suggestedColor=null;updateColorChips(null);
  window.dispatchEvent(new Event('jenga-board-reset'));
  blocks.forEach(b=>{world.removeBody(b.body);scene.remove(b.mesh);b.mesh.geometry.dispose();new Set(b.mesh.material).forEach(m=>{m.map.dispose();m.dispose();});});
  blocks=[];selected=null;motion=null;turn=0;topSlots=0;fallen=false;elapsed=0;phase='settling';
@@ -300,16 +357,37 @@ function reset(){
    mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);
    const b={id,level,slot,body,mesh,homeY:y,color,colorIndex};mesh.userData.block=b;blocks.push(b);
  }
- $('pieceInstruction').textContent='Toca un bloque o tira el dado';
+ $('pieceInstruction').textContent='Marca el color o toca un bloque';
  $('pieceDetail').textContent='Elige directamente en la torre 3D el bloque que vas a sacar.';
  $('towerTurns').textContent='0 bloques retirados';
- status('La torre de colores pastel está lista. Toca cualquier bloque para comenzar.');options();controls();
+ status('Torre lista. Marca qué color cayó en el dado físico o toca el bloque que sacaron.');options();controls();
 }
 
-function extract(){if(!selected||phase!=='ready'||fallen)return;window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();motion={b,origin:b.body.position.clone(),dir};b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));world.bodies.forEach(x=>x.wakeUp());status('Retirando bloque ' + b.color.name + ' · la torre busca su equilibrio…');controls();}
+function extract(){
+ if(!selected||phase!=='ready'||fallen)return;
+ window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));
+ const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();
+ b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();
+ motion={b,origin:b.body.position.clone(),dir};
+ b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();
+ b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));
+ world.bodies.forEach(x=>x.wakeUp());
+ status('Retirando bloque ' + b.color.name + ' · se ordena en el nivel superior…');
+ controls();
+}
 
-function place(){const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
- b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();topSlots++;turn++;$('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');phase='settling';elapsed=0;selected=null;suggestedColor=null;motion=null;status('Bloque ' + b.color.name + ' colocado arriba. Esperando estabilización…');}
+function place(){
+ const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);
+ b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
+ b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();
+ b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);
+ b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);
+ b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();
+ topSlots++;turn++;
+ $('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');
+ phase='settling';elapsed=0;motion=null;
+ status('Bloque ' + b.color.name + ' colocado arriba. Torre ordenada.');
+}
 
 function collapse(){fallen=true;phase='fallen';selected=null;suggestedColor=null;if(motion){motion.b.body.material=wood;motion.b.body.type=CANNON.Body.DYNAMIC;motion.b.body.updateMassProperties();motion.b.body.wakeUp();}motion=null;status('La torre virtual cayó. Si la torre real sigue en pie, puedes reconstruir la simulación.');$('pieceInstruction').textContent='¡La torre perdió el equilibrio!';$('pieceDetail').textContent='Reconstruye la torre para comenzar otra ronda.';controls();}
 
@@ -334,8 +412,7 @@ function update(dt){
  if(phase==='settling'&&elapsed>2){
    if(pendingCanonical&&session()?.isOnline()){const moves=pendingCanonical;canonical(moves);return;}
    pendingCanonical=null;phase='ready';options();
-   const nextId=session()?.getState()?.selectedId;if(nextId)select(blocks.find(b=>b.id===nextId));
-   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();status('Torre lista. Elige directamente en la torre el bloque que vas a sacar.');
+   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();
  }
  const now = performance.now();
  blocks.forEach(b=>{
@@ -367,13 +444,17 @@ function frame(time){
 }
 
 $('drawBlock').addEventListener('click',()=>rollAndPrompt());
+const rollVirtualBtn = $('rollVirtualDiceBtn');
+if(rollVirtualBtn) rollVirtualBtn.addEventListener('click',()=>rollAndPrompt());
+
 document.querySelectorAll('.dice-color-btn').forEach(btn=>{
  btn.addEventListener('click',e=>{
    e.stopPropagation();
    const colorIndex=Number(btn.dataset.color);
-   rollAndPrompt(colorIndex);
+   pickColor(colorIndex);
  });
 });
+
 $('blockPicker').addEventListener('change',e=>{const b=blocks.find(b=>b.id===Number(e.target.value));if(b)choose(b);});
 $('confirmBlock').addEventListener('click',()=>{if(selected&&phase==='ready')session()?.act('complete');});
 $('rebuildTower').addEventListener('click',()=>session()?.act('reset'));

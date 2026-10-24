@@ -27,28 +27,35 @@
           <p id="roundEndHint" class="round-end-hint" hidden>La ronda terminó. ¡Buen trabajo, equipo!</p>
         </div>
         <div class="arena-actions">
-          <p id="actionHint" class="action-hint" aria-live="polite">Tira el dado gigante o toca directamente en la torre el bloque que vas a sacar.</p>
+          <div id="diceColorSection" class="dice-color-section">
+            <div class="dice-color-header">
+              <span class="dice-color-title">1. ¿Qué color cayó en el dado físico?</span>
+              <button type="button" id="rollVirtualDiceBtn" class="btn-dice-subtle">🎲 Tirar dado 3D</button>
+            </div>
+            <div class="dice-color-grid" id="diceColorButtons">
+              <button type="button" class="dice-color-btn" data-color="0" style="background:#f8a5c2;color:#5e1a2b" title="Rosa pastel">🌸 Rosa</button>
+              <button type="button" class="dice-color-btn" data-color="1" style="background:#a0c4ff;color:#15325b" title="Azul pastel">🔵 Azul</button>
+              <button type="button" class="dice-color-btn" data-color="2" style="background:#7fd8be;color:#124335" title="Turquesa pastel">💧 Turquesa</button>
+              <button type="button" class="dice-color-btn" data-color="3" style="background:#b8e994;color:#284d14" title="Lima pastel">🍏 Lima</button>
+              <button type="button" class="dice-color-btn" data-color="4" style="background:#d1b2ff;color:#3b255c" title="Morado pastel">🟣 Morado</button>
+              <button type="button" class="dice-color-btn" data-color="5" style="background:#ffeaa7;color:#544310" title="Amarillo pastel">🟡 Amarillo</button>
+            </div>
+            <div id="colorBlockChips" class="color-block-chips" hidden>
+              <span id="chipsTitle" class="chips-title">2. Toca en la torre o elige el bloque que sacaron:</span>
+              <div id="chipsContainer" class="chips-container"></div>
+            </div>
+          </div>
+          <p id="actionHint" class="action-hint" aria-live="polite">Selecciona el color del dado y toca en la torre el bloque que sacaron.</p>
           <div class="turn-actions">
-            <button id="drawBlock" type="button" class="btn primary" disabled>🎲 Tirar dado gigante</button>
-            <details id="manualChoice" class="manual-choice"><summary>Elegir # / Color</summary>
+            <button id="drawBlock" type="button" class="btn primary" disabled style="display:none">🎲 Tirar dado gigante</button>
+            <details id="manualChoice" class="manual-choice"><summary>Todos los bloques</summary>
               <div>
-                <label for="blockPicker">Pieza del Jenga real</label>
-                <select id="blockPicker" disabled><option value="">Seleccionar una pieza…</option></select>
-                <div class="dice-color-picker">
-                  <label>O según el dado físico:</label>
-                  <div class="dice-color-buttons" id="diceColorButtons">
-                    <button type="button" class="dice-color-btn" data-color="0" style="background:#f8a5c2;color:#5e1a2b" title="Rosa pastel">🌸 Rosa</button>
-                    <button type="button" class="dice-color-btn" data-color="1" style="background:#a0c4ff;color:#15325b" title="Azul pastel">🔵 Azul</button>
-                    <button type="button" class="dice-color-btn" data-color="2" style="background:#7fd8be;color:#124335" title="Turquesa pastel">💧 Turquesa</button>
-                    <button type="button" class="dice-color-btn" data-color="3" style="background:#b8e994;color:#284d14" title="Lima pastel">🍏 Lima</button>
-                    <button type="button" class="dice-color-btn" data-color="4" style="background:#d1b2ff;color:#3b255c" title="Morado pastel">🟣 Morado</button>
-                    <button type="button" class="dice-color-btn" data-color="5" style="background:#ffeaa7;color:#544310" title="Amarillo pastel">🟡 Amarillo</button>
-                  </div>
-                </div>
+                <label for="blockPicker">Lista de bloques elegibles</label>
+                <select id="blockPicker" disabled><option value="">Seleccionar un bloque…</option></select>
               </div>
             </details>
-            <button id="markAnswered" type="button" class="btn primary" disabled hidden>Ya respondí</button>
-            <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Ya la coloqué · siguiente</button>
+            <button id="markAnswered" type="button" class="btn primary" disabled hidden>Guardar respuesta</button>
+            <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Siguiente turno →</button>
             <button id="seeAnswer" type="button" class="btn light" disabled hidden>Ver guía</button>
             <button id="openRoundMenu" type="button" class="btn primary" hidden>Opciones de la ronda</button>
             <span id="waitingTurn" class="waiting-turn" hidden>Espera tu turno</span>
@@ -62,8 +69,13 @@
       <div class="game-stats"><span id="towerTurns">0 piezas retiradas</span><span id="challengeCount">0 de 30 preguntas exploradas</span></div>
       <button id="rebuildTower" type="button" class="btn outline">Reconstruir y abrir nueva ronda</button>
       <details class="tower-guide"><summary>Cómo jugar con el Jenga gigante</summary>
-        <ol><li>Tu Jenga gigante de 54 piezas tiene 6 colores pastel (Rosa, Azul, Turquesa, Verde lima, Morado y Amarillo) distribuidos en 18 niveles de 3 piezas.</li><li>En tu turno, tira el dado gigante 3D (o lanza el dado físico) o simplemente toca en la torre el bloque de color que vas a sacar.</li><li>Escribe tu respuesta y pulsa «Guardar respuesta». Luego retira ese bloque en la torre real, colócalo arriba y confirma el movimiento.</li></ol>
-        <p>Las piezas 1–30 usan las 30 preguntas de salud; las piezas 31–54 repiten las preguntas 1–24. Tu respuesta escrita se guarda de forma segura para el equipo facilitador.</p>
+        <ol>
+          <li>Lanza el dado gigante físico en el salón.</li>
+          <li>En la pantalla, selecciona el color que cayó en el dado (Rosa, Azul, Turquesa, Verde lima, Morado o Amarillo).</li>
+          <li>Toca en la torre 3D el bloque de ese color que sacaron del Jenga real (o pulsa su nivel). Al seleccionarlo, la torre virtual se ordena de inmediato colocando el bloque arriba.</li>
+          <li>El participante responde su pregunta de salud y pulsa «Guardar respuesta». Luego pulsa «Siguiente turno» para continuar con el siguiente compañero.</li>
+        </ol>
+        <p>Las 30 preguntas de salud están distribuidas en los bloques. Las respuestas escritas se guardan para consulta y descarga en Excel por el equipo facilitador.</p>
         <p>La torre 3D es una aproximación visual; no predice la caída de la torre real. Si cae, el facilitador cierra la ronda.</p>
       </details>
       <details class="tower-guide"><summary>Para el facilitador</summary><p>Relaciona cada pieza con los hábitos de salud. No leas indicadores personales frente al grupo. Los retos pueden responderse verbalmente si una actividad resulta incómoda.</p><p>«La salud, como esta torre, se construye con decisiones cotidianas».</p></details>

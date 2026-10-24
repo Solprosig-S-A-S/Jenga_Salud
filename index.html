@@ -39,6 +39,23 @@
 .dice-color-btn:active{transform:scale(.97)}
 .manual-choice>div{width:260px}
 
+.dice-color-section{margin:0 0 12px;padding:12px 14px;background:#f4f9f5;border:1px solid #d0e4d7;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.dice-color-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.dice-color-title{font-size:12px;font-weight:900;color:#184a3c;letter-spacing:-.01em}
+.btn-dice-subtle{border:none;background:transparent;color:#087c78;font-size:11px;font-weight:800;cursor:pointer;padding:3px 6px;border-radius:6px;text-decoration:underline}
+.btn-dice-subtle:hover{background:#e2f0e8}
+.dice-color-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media(max-width:520px){.dice-color-grid{grid-template-columns:repeat(3,1fr)}}
+.dice-color-btn{border:2px solid transparent;border-radius:10px;padding:9px 4px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 4px rgba(0,0,0,.10);transition:transform .12s,border-color .12s,box-shadow .12s}
+.dice-color-btn:hover{transform:scale(1.04);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.dice-color-btn.is-active{border-color:#163f30!important;box-shadow:0 0 0 2px #fff, 0 3px 10px rgba(0,0,0,.25)!important;transform:scale(1.05)}
+.color-block-chips{margin-top:10px;padding-top:10px;border-top:1px dashed #c6ded0}
+.chips-title{font-size:11px;font-weight:850;color:#235645;display:block;margin-bottom:6px}
+.chips-container{display:flex;flex-wrap:wrap;gap:6px}
+.chip-btn{border:1px solid #bdd7c8;background:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;color:#18473a;cursor:pointer;transition:background .12s,border-color .12s,transform .12s}
+.chip-btn:hover{background:#e7f3ec;border-color:#087c78;transform:scale(1.03)}
+.chip-btn:active{transform:scale(.97)}
+
 </style>
 </head>
 <body>
@@ -194,28 +211,35 @@
           <p id="roundEndHint" class="round-end-hint" hidden>La ronda terminó. ¡Buen trabajo, equipo!</p>
         </div>
         <div class="arena-actions">
-          <p id="actionHint" class="action-hint" aria-live="polite">Tira el dado gigante o toca directamente en la torre el bloque que vas a sacar.</p>
+          <div id="diceColorSection" class="dice-color-section">
+            <div class="dice-color-header">
+              <span class="dice-color-title">1. ¿Qué color cayó en el dado físico?</span>
+              <button type="button" id="rollVirtualDiceBtn" class="btn-dice-subtle">🎲 Tirar dado 3D</button>
+            </div>
+            <div class="dice-color-grid" id="diceColorButtons">
+              <button type="button" class="dice-color-btn" data-color="0" style="background:#f8a5c2;color:#5e1a2b" title="Rosa pastel">🌸 Rosa</button>
+              <button type="button" class="dice-color-btn" data-color="1" style="background:#a0c4ff;color:#15325b" title="Azul pastel">🔵 Azul</button>
+              <button type="button" class="dice-color-btn" data-color="2" style="background:#7fd8be;color:#124335" title="Turquesa pastel">💧 Turquesa</button>
+              <button type="button" class="dice-color-btn" data-color="3" style="background:#b8e994;color:#284d14" title="Lima pastel">🍏 Lima</button>
+              <button type="button" class="dice-color-btn" data-color="4" style="background:#d1b2ff;color:#3b255c" title="Morado pastel">🟣 Morado</button>
+              <button type="button" class="dice-color-btn" data-color="5" style="background:#ffeaa7;color:#544310" title="Amarillo pastel">🟡 Amarillo</button>
+            </div>
+            <div id="colorBlockChips" class="color-block-chips" hidden>
+              <span id="chipsTitle" class="chips-title">2. Toca en la torre o elige el bloque que sacaron:</span>
+              <div id="chipsContainer" class="chips-container"></div>
+            </div>
+          </div>
+          <p id="actionHint" class="action-hint" aria-live="polite">Selecciona el color del dado y toca en la torre el bloque que sacaron.</p>
           <div class="turn-actions">
-            <button id="drawBlock" type="button" class="btn primary" disabled>🎲 Tirar dado gigante</button>
-            <details id="manualChoice" class="manual-choice"><summary>Elegir # / Color</summary>
+            <button id="drawBlock" type="button" class="btn primary" disabled style="display:none">🎲 Tirar dado gigante</button>
+            <details id="manualChoice" class="manual-choice"><summary>Todos los bloques</summary>
               <div>
-                <label for="blockPicker">Pieza del Jenga real</label>
-                <select id="blockPicker" disabled><option value="">Seleccionar una pieza…</option></select>
-                <div class="dice-color-picker">
-                  <label>O según el dado físico:</label>
-                  <div class="dice-color-buttons" id="diceColorButtons">
-                    <button type="button" class="dice-color-btn" data-color="0" style="background:#f8a5c2;color:#5e1a2b" title="Rosa pastel">🌸 Rosa</button>
-                    <button type="button" class="dice-color-btn" data-color="1" style="background:#a0c4ff;color:#15325b" title="Azul pastel">🔵 Azul</button>
-                    <button type="button" class="dice-color-btn" data-color="2" style="background:#7fd8be;color:#124335" title="Turquesa pastel">💧 Turquesa</button>
-                    <button type="button" class="dice-color-btn" data-color="3" style="background:#b8e994;color:#284d14" title="Lima pastel">🍏 Lima</button>
-                    <button type="button" class="dice-color-btn" data-color="4" style="background:#d1b2ff;color:#3b255c" title="Morado pastel">🟣 Morado</button>
-                    <button type="button" class="dice-color-btn" data-color="5" style="background:#ffeaa7;color:#544310" title="Amarillo pastel">🟡 Amarillo</button>
-                  </div>
-                </div>
+                <label for="blockPicker">Lista de bloques elegibles</label>
+                <select id="blockPicker" disabled><option value="">Seleccionar un bloque…</option></select>
               </div>
             </details>
-            <button id="markAnswered" type="button" class="btn primary" disabled hidden>Ya respondí</button>
-            <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Ya la coloqué · siguiente</button>
+            <button id="markAnswered" type="button" class="btn primary" disabled hidden>Guardar respuesta</button>
+            <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Siguiente turno →</button>
             <button id="seeAnswer" type="button" class="btn light" disabled hidden>Ver guía</button>
             <button id="openRoundMenu" type="button" class="btn primary" hidden>Opciones de la ronda</button>
             <span id="waitingTurn" class="waiting-turn" hidden>Espera tu turno</span>
@@ -229,8 +253,13 @@
       <div class="game-stats"><span id="towerTurns">0 piezas retiradas</span><span id="challengeCount">0 de 30 preguntas exploradas</span></div>
       <button id="rebuildTower" type="button" class="btn outline">Reconstruir y abrir nueva ronda</button>
       <details class="tower-guide"><summary>Cómo jugar con el Jenga gigante</summary>
-        <ol><li>Tu Jenga gigante de 54 piezas tiene 6 colores pastel (Rosa, Azul, Turquesa, Verde lima, Morado y Amarillo) distribuidos en 18 niveles de 3 piezas.</li><li>En tu turno, tira el dado gigante 3D (o lanza el dado físico) o simplemente toca en la torre el bloque de color que vas a sacar.</li><li>Escribe tu respuesta y pulsa «Guardar respuesta». Luego retira ese bloque en la torre real, colócalo arriba y confirma el movimiento.</li></ol>
-        <p>Las piezas 1–30 usan las 30 preguntas de salud; las piezas 31–54 repiten las preguntas 1–24. Tu respuesta escrita se guarda de forma segura para el equipo facilitador.</p>
+        <ol>
+          <li>Lanza el dado gigante físico en el salón.</li>
+          <li>En la pantalla, selecciona el color que cayó en el dado (Rosa, Azul, Turquesa, Verde lima, Morado o Amarillo).</li>
+          <li>Toca en la torre 3D el bloque de ese color que sacaron del Jenga real (o pulsa su nivel). Al seleccionarlo, la torre virtual se ordena de inmediato colocando el bloque arriba.</li>
+          <li>El participante responde su pregunta de salud y pulsa «Guardar respuesta». Luego pulsa «Siguiente turno» para continuar con el siguiente compañero.</li>
+        </ol>
+        <p>Las 30 preguntas de salud están distribuidas en los bloques. Las respuestas escritas se guardan para consulta y descarga en Excel por el equipo facilitador.</p>
         <p>La torre 3D es una aproximación visual; no predice la caída de la torre real. Si cae, el facilitador cierra la ronda.</p>
       </details>
       <details class="tower-guide"><summary>Para el facilitador</summary><p>Relaciona cada pieza con los hábitos de salud. No leas indicadores personales frente al grupo. Los retos pueden responderse verbalmente si una actividad resulta incómoda.</p><p>«La salud, como esta torre, se construye con decisiones cotidianas».</p></details>
@@ -13840,18 +13869,45 @@ function controls(){
  });
 }
 
+function updateColorChips(colorIndex){
+ const wrap=$('colorBlockChips'), box=$('chipsContainer'), title=$('chipsTitle');
+ if(!wrap||!box)return;
+ if(colorIndex===null||colorIndex===undefined){wrap.hidden=true;box.replaceChildren();return;}
+ const color=JENGA_COLORS[colorIndex];
+ const avails=eligible().filter(b=>b.colorIndex===colorIndex).sort((a,b)=>a.level-b.level);
+ if(!avails.length){
+   wrap.hidden=false;
+   title.textContent='No quedan bloques '+color.name+' elegibles. Elige otro color:';
+   box.replaceChildren();
+   return;
+ }
+ wrap.hidden=false;
+ title.textContent='2. Toca en la torre o pulsa el bloque ' + color.name + ' que sacaron:';
+ box.replaceChildren();
+ avails.forEach(b=>{
+   const btn=document.createElement('button');btn.type='button';btn.className='chip-btn';
+   const pos=b.slot===0?'izq.':b.slot===1?'centro':'der.';
+   btn.textContent='Nivel '+(b.level+1)+' ('+pos+')';
+   btn.addEventListener('click',()=>choose(b));
+   box.appendChild(btn);
+ });
+}
+
 function options(){
  const list=$('blockPicker');
  list.replaceChildren(new Option('Seleccionar un bloque…',''));
  eligible().sort((a,b)=>a.id-b.id).forEach(b=>{
-   const pos = b.slot === 0 ? 'lateral' : b.slot === 1 ? 'centro' : 'lateral';
+   const pos = b.slot === 0 ? 'lateral izq.' : b.slot === 1 ? 'centro' : 'lateral der.';
    list.add(new Option(b.color.name + ' · Nivel ' + (b.level+1) + ' (' + pos + ')', String(b.id)));
  });
+ if(suggestedColor!==null)updateColorChips(suggestedColor);
 }
 
 function select(b){
  if(!b)return;
  suggestedColor = null;
+ updateColorChips(null);
+ document.querySelectorAll('.dice-color-btn').forEach(btn => btn.classList.remove('is-active'));
  if(selected?.id!==b.id&&animations()?.enabled()&&!animations().paused()){
    const goal=(b.level%2?Math.PI:Math.PI/2)+.22;
    const angle=((goal-azimuth+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
@@ -13861,7 +13917,7 @@ function select(b){
  window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
  $('pieceInstruction').textContent='Bloque ' + b.color.name;
  $('pieceDetail').textContent='Nivel ' + (b.level+1) + ' · posición ' + (b.slot===0?'lateral':b.slot===1?'centro':'lateral') + ' (3 en fila)';
- status('Bloque ' + b.color.name + ' seleccionado. Responde la pregunta antes de confirmar la retirada.');
+ status('Bloque ' + b.color.name + ' retirado. La torre se ordena arriba. Responde la pregunta para pasar el turno.');
  controls();
 }
 
@@ -13897,6 +13953,15 @@ function initDice(){
  diceMesh.position.copy(DICE_REST_POS);
  diceMesh.quaternion.setFromEuler(new THREE.Euler(0.2,0.4,0));
  scene.add(diceMesh);
+}
+
+function tiltDiceToColor(colorIndex){
+ if(!diceMesh||diceRolling)return;
+ const toCam=camera.position.clone().sub(DICE_REST_POS).normalize();
+ toCam.y=Math.max(0.42,toCam.y+0.2);toCam.normalize();
+ const normal=DICE_FACE_NORMALS[colorIndex];
+ const q=new THREE.Quaternion().setFromUnitVectors(normal,toCam);
+ diceMesh.quaternion.copy(q);
 }
 
 function rollDice(targetColorIndex,onComplete){
@@ -13950,7 +14015,7 @@ function updateDice(dt){
 function rollAndPrompt(specificColorIndex=null){
  if(phase!=='ready'||fallen||!session()?.can('draw')||diceRolling)return;
  const choices=eligible();
- if(!choices.length){status('No quedan piezas disponibles bajo los dos niveles superiores. Reconstruye la torre.');return;}
+ if(!choices.length){status('No quedan bloques disponibles bajo los dos niveles superiores. Reconstruye la torre.');return;}
  let targetColor=specificColorIndex;
  if(targetColor===null||targetColor===undefined){
    const availableColors=[...new Set(choices.map(b=>b.colorIndex))];
@@ -13958,11 +14023,22 @@ function rollAndPrompt(specificColorIndex=null){
  }
  const color=JENGA_COLORS[targetColor];
  rollDice(targetColor,()=>{
-   suggestedColor=targetColor;
-   $('pieceInstruction').textContent='Elige tu bloque ' + color.name;
-   $('pieceDetail').textContent='Toca en la torre 3D el bloque ' + color.name + ' que quieras retirar.';
-   status('🎲 ¡Salió ' + color.name.toUpperCase() + '! Toca en la torre el bloque que prefieras sacar.');
+   pickColor(targetColor);
+   status('🎲 ¡Salió ' + color.name.toUpperCase() + '! Toca en la torre el bloque que sacaron.');
  });
+}
+
+function pickColor(colorIndex){
+ suggestedColor=colorIndex;
+ tiltDiceToColor(colorIndex);
+ const color=JENGA_COLORS[colorIndex];
+ document.querySelectorAll('.dice-color-btn').forEach(btn=>{
+   btn.classList.toggle('is-active', Number(btn.dataset.color)===colorIndex);
+ });
+ updateColorChips(colorIndex);
+ $('pieceInstruction').textContent='Elige tu bloque ' + color.name;
+ $('pieceDetail').textContent='Toca en la torre 3D o pulsa abajo el bloque ' + color.name + ' que sacaron.';
+ status(color.name + ': toca en la torre el bloque que sacaron para que se ordene arriba.');
 }
 
 function canonical(moves){
@@ -13986,12 +14062,22 @@ function roomUpdate(next,previous){
  }else if(moves.length>appliedMoves.length){
    const added=moves.slice(appliedMoves.length);appliedMoves=[...moves];
    added.forEach(id=>window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id,completed:true}})));
-   if(added.length===1&&phase==='ready'&&!fallen){selected=blocks.find(b=>b.id===added[0]);pendingCanonical=moves;extract();}
-   else canonical(moves);
+   // If the block is already at the top or being animated, update canonical
+   if(added.length===1&&phase==='ready'&&!fallen&&(!selected||selected.id!==added[0])){
+     selected=blocks.find(b=>b.id===added[0]);pendingCanonical=moves;extract();
+   }else canonical(moves);
  }
  if(next.status==='lobby'&&previous?.status!=='lobby'){window.dispatchEvent(new Event('jenga-board-reset'));canonical([]);}
- if(next.selectedId!==null&&!motion)select(blocks.find(b=>b.id===next.selectedId));
- else if(!motion)selected=null;
+ if(next.selectedId!==null&&!motion){
+   const nextBlock=blocks.find(b=>b.id===next.selectedId);
+   if(nextBlock&&(!selected||selected.id!==nextBlock.id)){
+     select(nextBlock);
+     // "Cuando lo hacen, se ordena todo": animate extraction & placement immediately!
+     if(phase==='ready'&&!fallen)extract();
+   }
+ }else if(!motion&&next.selectedId===null){
+   selected=null;
+ }
  window.dispatchEvent(new CustomEvent('jenga-answer-state',{detail:{revealed:next.revealed}}));
  controls();
 }
@@ -14070,7 +14156,7 @@ function resize(){if(!renderer||!host.clientWidth)return;const w=host.clientWidt
 
 function reset(){
  if(!world)return;
- entranceTime=0;cameraCue=null;suggestedColor=null;
+ entranceTime=0;cameraCue=null;suggestedColor=null;updateColorChips(null);
  window.dispatchEvent(new Event('jenga-board-reset'));
  blocks.forEach(b=>{world.removeBody(b.body);scene.remove(b.mesh);b.mesh.geometry.dispose();new Set(b.mesh.material).forEach(m=>{m.map.dispose();m.dispose();});});
  blocks=[];selected=null;motion=null;turn=0;topSlots=0;fallen=false;elapsed=0;phase='settling';
@@ -14087,16 +14173,37 @@ function reset(){
    mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);
    const b={id,level,slot,body,mesh,homeY:y,color,colorIndex};mesh.userData.block=b;blocks.push(b);
  }
- $('pieceInstruction').textContent='Toca un bloque o tira el dado';
+ $('pieceInstruction').textContent='Marca el color o toca un bloque';
  $('pieceDetail').textContent='Elige directamente en la torre 3D el bloque que vas a sacar.';
  $('towerTurns').textContent='0 bloques retirados';
- status('La torre de colores pastel está lista. Toca cualquier bloque para comenzar.');options();controls();
+ status('Torre lista. Marca qué color cayó en el dado físico o toca el bloque que sacaron.');options();controls();
 }
 
-function extract(){if(!selected||phase!=='ready'||fallen)return;window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();motion={b,origin:b.body.position.clone(),dir};b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));world.bodies.forEach(x=>x.wakeUp());status('Retirando bloque ' + b.color.name + ' · la torre busca su equilibrio…');controls();}
+function extract(){
+ if(!selected||phase!=='ready'||fallen)return;
+ window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:true}));
+ const b=selected;phase='pulling';elapsed=0;const dir=new CANNON.Vec3();
+ b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();
+ motion={b,origin:b.body.position.clone(),dir};
+ b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();
+ b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));
+ world.bodies.forEach(x=>x.wakeUp());
+ status('Retirando bloque ' + b.color.name + ' · se ordena en el nivel superior…');
+ controls();
+}
 
-function place(){const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
- b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();topSlots++;turn++;$('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');phase='settling';elapsed=0;selected=null;suggestedColor=null;motion=null;status('Bloque ' + b.color.name + ' colocado arriba. Esperando estabilización…');}
+function place(){
+ const b=motion.b,level=18+Math.floor(topSlots/3),slot=topSlots%3,pos=(slot-1)*(W+GAP);
+ b.level=level;b.slot=slot;b.homeY=H/2+level*STEP;
+ b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.mass=.3;b.body.updateMassProperties();
+ b.body.position.set(level%2?pos:0,b.homeY+.10,level%2?0:pos);
+ b.body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);
+ b.body.velocity.setZero();b.body.angularVelocity.setZero();b.body.aabbNeedsUpdate=true;b.body.wakeUp();
+ topSlots++;turn++;
+ $('towerTurns').textContent=turn+(turn===1?' bloque retirado':' bloques retirados');
+ phase='settling';elapsed=0;motion=null;
+ status('Bloque ' + b.color.name + ' colocado arriba. Torre ordenada.');
+}
 
 function collapse(){fallen=true;phase='fallen';selected=null;suggestedColor=null;if(motion){motion.b.body.material=wood;motion.b.body.type=CANNON.Body.DYNAMIC;motion.b.body.updateMassProperties();motion.b.body.wakeUp();}motion=null;status('La torre virtual cayó. Si la torre real sigue en pie, puedes reconstruir la simulación.');$('pieceInstruction').textContent='¡La torre perdió el equilibrio!';$('pieceDetail').textContent='Reconstruye la torre para comenzar otra ronda.';controls();}
 
@@ -14121,8 +14228,7 @@ function update(dt){
  if(phase==='settling'&&elapsed>2){
    if(pendingCanonical&&session()?.isOnline()){const moves=pendingCanonical;canonical(moves);return;}
    pendingCanonical=null;phase='ready';options();
-   const nextId=session()?.getState()?.selectedId;if(nextId)select(blocks.find(b=>b.id===nextId));
-   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();status('Torre lista. Elige directamente en la torre el bloque que vas a sacar.');
+   window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();
  }
  const now = performance.now();
  blocks.forEach(b=>{
@@ -14154,13 +14260,17 @@ function frame(time){
 }
 
 $('drawBlock').addEventListener('click',()=>rollAndPrompt());
+const rollVirtualBtn = $('rollVirtualDiceBtn');
+if(rollVirtualBtn) rollVirtualBtn.addEventListener('click',()=>rollAndPrompt());
+
 document.querySelectorAll('.dice-color-btn').forEach(btn=>{
  btn.addEventListener('click',e=>{
    e.stopPropagation();
    const colorIndex=Number(btn.dataset.color);
-   rollAndPrompt(colorIndex);
+   pickColor(colorIndex);
  });
 });
+
 $('blockPicker').addEventListener('change',e=>{const b=blocks.find(b=>b.id===Number(e.target.value));if(b)choose(b);});
 $('confirmBlock').addEventListener('click',()=>{if(selected&&phase==='ready')session()?.act('complete');});
 $('rebuildTower').addEventListener('click',()=>session()?.act('reset'));
@@ -14204,7 +14314,7 @@ function render(){
  const mine=!!state&&(!session.isOnline()||state.activeId===state.selfId),ended=state?.status==='ended';
  const chosen=state?.selectedId!==null&&state?.selectedId!==undefined;
  const step=moving?'move':!chosen?'choose':state.answered?'move':'answer';
- $('playArena').dataset.step=step;$('playArena').classList.toggle('is-moving',moving);
+ $('playArena').dataset.step=step;if($('diceColorSection'))$('diceColorSection').hidden=!mine||chosen||moving||ended;$('playArena').classList.toggle('is-moving',moving);
  document.querySelectorAll('[data-turn-step]').forEach(node=>{
   const order=['choose','answer','move'],index=order.indexOf(node.dataset.turnStep),current=order.indexOf(step);
   node.classList.toggle('is-current',index===current);node.classList.toggle('is-done',index<current);
@@ -14216,7 +14326,7 @@ function render(){
  $('markAnswered').hidden=!playing||!mine||!chosen||state.answered||moving||ended;
  $('confirmBlock').hidden=!playing||!mine||!chosen||!state.answered||moving||ended;
  $('seeAnswer').hidden=!playing||!mine||!chosen||!state.answered||state.revealed||moving||ended;
- $('markAnswered').textContent='Guardar respuesta';$('confirmBlock').textContent='Ya la coloqué · siguiente';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
+ $('markAnswered').textContent='Guardar respuesta';$('confirmBlock').textContent='Siguiente turno →';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
  $('waitingTurn').hidden=!playing||ended||(!moving&&mine);
  const active=state?.players.find(p=>p.id===state.activeId)?.name||'';
  $('waitingTurn').textContent=moving?'La torre se está acomodando…':'Juega '+active;
@@ -14228,8 +14338,8 @@ function render(){
  const written=$('playerResponse').value.trim();
  $('responseEcho').hidden=!mine||!chosen||!state?.answered||!written;
  if(!$('responseEcho').hidden)$('responseEcho').textContent='Tu respuesta: '+written;
- $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Tira el dado gigante o toca en la torre el bloque que vas a sacar.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
- if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu bloque':'responde el reto'):'tira el dado o toca un bloque'):'Es el turno de '+active+'.';
+ $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Marca el color del dado y toca en la torre el bloque que sacaron.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
+ if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu bloque':'responde el reto'):'marca el color y toca el bloque sacado'):'Es el turno de '+active+'.';
  if(chosen&&lastPiece!==state.selectedId){
   document.body.classList.remove('tower-expanded');$('questionPanel').scrollTop=0;
   effect($('challengeQuestion'),[{opacity:.2,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],420);

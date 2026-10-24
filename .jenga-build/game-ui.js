@@ -21,7 +21,7 @@ function render(){
  const mine=!!state&&(!session.isOnline()||state.activeId===state.selfId),ended=state?.status==='ended';
  const chosen=state?.selectedId!==null&&state?.selectedId!==undefined;
  const step=moving?'move':!chosen?'choose':state.answered?'move':'answer';
- $('playArena').dataset.step=step;$('playArena').classList.toggle('is-moving',moving);
+ $('playArena').dataset.step=step;if($('diceColorSection'))$('diceColorSection').hidden=!mine||chosen||moving||ended;$('playArena').classList.toggle('is-moving',moving);
  document.querySelectorAll('[data-turn-step]').forEach(node=>{
   const order=['choose','answer','move'],index=order.indexOf(node.dataset.turnStep),current=order.indexOf(step);
   node.classList.toggle('is-current',index===current);node.classList.toggle('is-done',index<current);
@@ -33,7 +33,7 @@ function render(){
  $('markAnswered').hidden=!playing||!mine||!chosen||state.answered||moving||ended;
  $('confirmBlock').hidden=!playing||!mine||!chosen||!state.answered||moving||ended;
  $('seeAnswer').hidden=!playing||!mine||!chosen||!state.answered||state.revealed||moving||ended;
- $('markAnswered').textContent='Guardar respuesta';$('confirmBlock').textContent='Ya la coloqué · siguiente';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
+ $('markAnswered').textContent='Guardar respuesta';$('confirmBlock').textContent='Siguiente turno →';$('seeAnswer').textContent=mobile.matches?'Ver guía':'Ver respuesta';
  $('waitingTurn').hidden=!playing||ended||(!moving&&mine);
  const active=state?.players.find(p=>p.id===state.activeId)?.name||'';
  $('waitingTurn').textContent=moving?'La torre se está acomodando…':'Juega '+active;
@@ -45,8 +45,8 @@ function render(){
  const written=$('playerResponse').value.trim();
  $('responseEcho').hidden=!mine||!chosen||!state?.answered||!written;
  if(!$('responseEcho').hidden)$('responseEcho').textContent='Tu respuesta: '+written;
- $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Tira el dado gigante o toca en la torre el bloque que vas a sacar.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
- if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu bloque':'responde el reto'):'tira el dado o toca un bloque'):'Es el turno de '+active+'.';
+ $('actionHint').textContent=ended?'La ronda terminó.':moving?'Un momento, estamos colocando la pieza.':!mine?'Sigue la pieza y la pregunta del turno.':step==='choose'?'Marca el color del dado y toca en la torre el bloque que sacaron.':step==='answer'?'Escribe y guarda tu respuesta.':'Retira la pieza real y colócala arriba.';
+ if(playing)$('turnMessage').textContent=ended?'Una nueva ronda, cuando el equipo esté listo.':moving?'Preparando el siguiente movimiento…':mine?'Tu turno · '+(chosen?(state.answered?'mueve tu bloque':'responde el reto'):'marca el color y toca el bloque sacado'):'Es el turno de '+active+'.';
  if(chosen&&lastPiece!==state.selectedId){
   document.body.classList.remove('tower-expanded');$('questionPanel').scrollTop=0;
   effect($('challengeQuestion'),[{opacity:.2,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],420);
