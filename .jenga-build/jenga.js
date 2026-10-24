@@ -370,7 +370,7 @@ function extract(){
  b.body.quaternion.vmult(new CANNON.Vec3(1,0,0),dir);dir.y=0;dir.normalize();
  motion={b,origin:b.body.position.clone(),dir};
  b.body.material=sliding;b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();
- b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(.55));
+ b.body.angularVelocity.setZero();b.body.velocity.copy(dir.scale(1.85));
  world.bodies.forEach(x=>x.wakeUp());
  status('Retirando bloque ' + b.color.name + ' · se ordena en el nivel superior…');
  controls();
@@ -396,12 +396,12 @@ function update(dt){
  updateDice(dt);
  if(phase==='pulling'){
    const {b,origin,dir}=motion;
-   b.body.velocity.copy(dir.scale(.55));
+   b.body.velocity.copy(dir.scale(1.85));
    const offset=b.body.position.vsub(origin).dot(dir);
    if(offset>3.35){b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.velocity.setZero();b.body.angularVelocity.setZero();phase='lifting';elapsed=0;motion.liftStart=b.body.position.clone();}
    else if(elapsed>12){b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.updateMassProperties();b.body.velocity.setZero();phase='ready';motion=null;status('Prueba otro bloque o vuelve a intentarlo.');controls();}
  }else if(phase==='lifting'){
-   const b=motion.b,t=Math.min(elapsed/2,1),rise=Math.min(t/.65,1),slide=Math.max(0,(t-.65)/.35),s=slide*slide*(3-2*slide),y=Math.max(...blocks.filter(x=>x!==b).map(x=>x.body.position.y))+1.3;
+   const b=motion.b,t=Math.min(elapsed/0.65,1),rise=Math.min(t/.65,1),slide=Math.max(0,(t-.45)/.55),s=slide*slide*(3-2*slide),y=Math.max(...blocks.filter(x=>x!==b).map(x=>x.body.position.y))+1.3;
    b.body.position.set(motion.liftStart.x*(1-s),motion.liftStart.y+(y-motion.liftStart.y)*rise,motion.liftStart.z*(1-s));b.body.aabbNeedsUpdate=true;
    if(t===1)place();
  }
@@ -409,7 +409,7 @@ function update(dt){
  if(!fallen&&elapsed>.7&&blocks.some(b=>b!==motion?.b&&(b.body.position.y<b.homeY-1.0||Math.abs(b.body.quaternion.x)>.35||Math.abs(b.body.quaternion.z)>.35))){
    if(session()?.isOnline()){canonical(session().getState().moves);return;}else collapse();
  }
- if(phase==='settling'&&elapsed>2){
+ if(phase==='settling'&&elapsed>0.6){
    if(pendingCanonical&&session()?.isOnline()){const moves=pendingCanonical;canonical(moves);return;}
    pendingCanonical=null;phase='ready';options();
    window.dispatchEvent(new CustomEvent('jenga-board-busy',{detail:false}));controls();
