@@ -11,3 +11,12 @@
 @media(max-width:700px){body.jenga-focus{height:var(--game-height,100dvh)}body.jenga-focus.response-focused .play-arena{grid-template-rows:minmax(105px,1fr) minmax(0,auto) auto}body.jenga-focus.response-focused .question-panel{max-height:max(80px,calc(var(--game-height,100dvh) - 240px))}}
 .turn-toast{position:absolute;top:66px;left:18px;right:18px;z-index:4;pointer-events:none;text-align:center;width:fit-content;max-width:calc(100% - 36px);margin:auto;padding:9px 18px;border:1px solid #c4eba4;background:#e8ffdff2;border-radius:30px;box-shadow:0 8px 25px #153c3018;color:#1b563c;font-size:14px;font-weight:850;overflow-wrap:anywhere}.motion-paused #juego *{animation:none!important}.tower-controls #motionToggle{font-size:15px}.tower-controls #motionToggle[aria-pressed="true"]{background:#e0f2de;border-color:#a9d39d}
 @media(prefers-reduced-motion:no-preference){body:not(.motion-paused) #drawBlock:not(:disabled):not([hidden]){animation:invite-draw 5s ease-in-out infinite}@keyframes invite-draw{0%,75%,100%{box-shadow:0 0 0 0 #087c7800}85%{box-shadow:0 0 0 7px #087c781a}}}
+
+.color-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:900;letter-spacing:.03em;vertical-align:middle;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.dice-color-picker{margin-top:10px;padding-top:10px;border-top:1px solid #dce8dd}
+.dice-color-picker label{font-size:11px;font-weight:800;display:block;margin-bottom:6px;color:#27584c}
+.dice-color-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.dice-color-btn{border:none;border-radius:8px;padding:7px 4px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:transform .12s,filter .12s}
+.dice-color-btn:hover{filter:brightness(1.08);transform:scale(1.03)}
+.dice-color-btn:active{transform:scale(.97)}
+.manual-choice>div{width:260px}

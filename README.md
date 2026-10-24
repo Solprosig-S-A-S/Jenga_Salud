@@ -1,6 +1,6 @@
 # Mi salud, bloque a bloque · SOLPROSIG
 
-Juego educativo con una torre Jenga 3D, 30 preguntas de autocuidado y partidas por turnos. Incluye modo local sin internet y salas de Supabase para compartir la pieza, la pregunta, la respuesta y el turno entre dispositivos.
+Juego educativo con una torre Jenga gigante 3D de 6 colores corporativos (Rosa, Azul, Turquesa, Verde lima, Morado y Amarillo), dado gigante 3D animado con física de giro y rebote, 30 preguntas de autocuidado y partidas por turnos. Incluye modo local sin internet y salas de Supabase para compartir la pieza, la pregunta, la respuesta y el turno entre dispositivos.
 
 **Juego:** https://solprosig-s-a-s.github.io/Jenga_Salud/
 

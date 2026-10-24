@@ -29,8 +29,24 @@
         <div class="arena-actions">
           <p id="actionHint" class="action-hint" aria-live="polite">Elige una pieza para comenzar.</p>
           <div class="turn-actions">
-            <button id="drawBlock" type="button" class="btn primary" disabled>🎲 Sortear pieza</button>
-            <details id="manualChoice" class="manual-choice"><summary>Elegir #</summary><div><label for="blockPicker">Pieza del Jenga real</label><select id="blockPicker" disabled><option value="">Seleccionar una pieza…</option></select></div></details>
+            <button id="drawBlock" type="button" class="btn primary" disabled>🎲 Tirar dado gigante</button>
+            <details id="manualChoice" class="manual-choice"><summary>Elegir # / Color</summary>
+              <div>
+                <label for="blockPicker">Pieza del Jenga real</label>
+                <select id="blockPicker" disabled><option value="">Seleccionar una pieza…</option></select>
+                <div class="dice-color-picker">
+                  <label>O según el dado físico:</label>
+                  <div class="dice-color-buttons" id="diceColorButtons">
+                    <button type="button" class="dice-color-btn" data-color="0" style="background:#ff2d75;color:#fff" title="Rosa">🌸 Rosa</button>
+                    <button type="button" class="dice-color-btn" data-color="1" style="background:#1976d2;color:#fff" title="Azul">🔵 Azul</button>
+                    <button type="button" class="dice-color-btn" data-color="2" style="background:#00bfa5;color:#fff" title="Turquesa">💧 Turquesa</button>
+                    <button type="button" class="dice-color-btn" data-color="3" style="background:#76ff03;color:#153d08" title="Lima">🍏 Lima</button>
+                    <button type="button" class="dice-color-btn" data-color="4" style="background:#8e24aa;color:#fff" title="Morado">🟣 Morado</button>
+                    <button type="button" class="dice-color-btn" data-color="5" style="background:#ffd600;color:#2c1e02" title="Amarillo">🟡 Amarillo</button>
+                  </div>
+                </div>
+              </div>
+            </details>
             <button id="markAnswered" type="button" class="btn primary" disabled hidden>Ya respondí</button>
             <button id="confirmBlock" type="button" class="btn primary" disabled hidden>Ya la coloqué · siguiente</button>
             <button id="seeAnswer" type="button" class="btn light" disabled hidden>Ver guía</button>
@@ -45,9 +61,9 @@
       <div id="gameMenuRoom"></div>
       <div class="game-stats"><span id="towerTurns">0 piezas retiradas</span><span id="challengeCount">0 de 30 preguntas exploradas</span></div>
       <button id="rebuildTower" type="button" class="btn outline">Reconstruir y abrir nueva ronda</button>
-      <details class="tower-guide"><summary>Cómo jugar con el Jenga real</summary>
-        <ol><li>Numera 54 piezas, de la base hacia arriba, en 18 niveles de tres. Copia el orden de la pantalla.</li><li>En tu turno, sortea o elige una pieza. Responde su pregunta en voz alta o escribe en tu dispositivo.</li><li>Retira esa pieza en la torre real, colócala arriba y confirma para pasar el turno.</li></ol>
-        <p>Las piezas 1–30 usan las 30 preguntas. Las piezas 31–54 repiten las preguntas 1–24. Tu respuesta escrita solo permanece en este dispositivo durante el turno.</p>
+      <details class="tower-guide"><summary>Cómo jugar con el Jenga gigante</summary>
+        <ol><li>Tu Jenga gigante de 54 piezas tiene 6 colores (Rosa, Azul, Turquesa, Verde lima, Morado y Amarillo) distribuidos en 18 niveles de 3 piezas. Copia el orden de la pantalla.</li><li>En tu turno, tira el dado gigante 3D (o lanza el dado físico y marca el color). El dado dará las vueltas necesarias hasta caer en tu color.</li><li>Escribe tu respuesta y pulsa «Guardar respuesta». Luego retira esa pieza en la torre real, colócala arriba y confirma el movimiento.</li></ol>
+        <p>Las piezas 1–30 usan las 30 preguntas de salud; las piezas 31–54 repiten las preguntas 1–24. Tu respuesta escrita se guarda de forma segura para el equipo facilitador.</p>
         <p>La torre 3D es una aproximación visual; no predice la caída de la torre real. Si cae, el facilitador cierra la ronda.</p>
       </details>
       <details class="tower-guide"><summary>Para el facilitador</summary><p>Relaciona cada pieza con los hábitos de salud. No leas indicadores personales frente al grupo. Los retos pueden responderse verbalmente si una actividad resulta incómoda.</p><p>«La salud, como esta torre, se construye con decisiones cotidianas».</p></details>

@@ -71,8 +71,10 @@ function setBlockChallenge(detail){
   const index=(detail.id-1)%challenges.length;
   const changed=currentPiece!==detail.id;
   currentPiece=detail.id;current=challenges[index];
-  el('blockLabel').textContent='PIEZA #'+detail.id+' · '+current[3];
-  el('challengeType').textContent=current[0]+' · Pregunta '+(index+1);
+  const color=(window.JENGA_COLORS||[])[(detail.id-1)%6];
+  const colorHtml=color?' · <span class="color-badge" style="background:'+color.hex+';color:'+color.text+'">'+color.name.toUpperCase()+'</span>':'';
+  el('blockLabel').innerHTML='PIEZA #'+detail.id+colorHtml+' · '+current[3];
+  el('challengeType').textContent=current[0]+' · Pregunta '+(index+1)+(color?' ('+color.name+')':'');
   el('challengeQuestion').textContent=current[1];
   el('challengeAnswer').textContent='Respuesta o guía: '+current[2];
   if(changed){el('challengeAnswer').classList.remove('visible');el('seeAnswer').textContent='👀 Ver respuesta';}
