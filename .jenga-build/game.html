@@ -11,7 +11,7 @@
             <button id="rotateLeft" type="button" aria-label="Girar vista a la izquierda">↶</button>
             <span id="pieceDetail" class="piece-location">Arrastra para girar</span>
             <button id="rotateRight" type="button" aria-label="Girar vista a la derecha">↷</button>
-            <button id="motionToggle" type="button" aria-pressed="true" aria-label="Pausar animaciones automáticas">⏸</button>
+            <button id="shuffleColorsBtn" type="button" class="btn-shuffle" aria-label="Desordenar colores de la torre" title="Desordenar colores de la torre">🔀</button><button id="motionToggle" type="button" aria-pressed="true" aria-label="Pausar animaciones automáticas">⏸</button>
             <label class="tower-zoom">Zoom <input id="zoomTower" type="range" min="17" max="34" value="24" aria-label="Distancia de la cámara"></label>
           </div>
           <div id="towerStatus" class="tower-status" role="status" aria-live="polite">Preparando la torre…</div>
@@ -30,7 +30,7 @@
           <div id="diceColorSection" class="dice-color-section">
             <div class="dice-color-header">
               <span class="dice-color-title">1. ¿Qué color cayó en el dado físico?</span>
-              <button type="button" id="rollVirtualDiceBtn" class="btn-dice-subtle">🎲 Tirar dado 3D</button>
+              <button type="button" id="shuffleTowerBtn" class="btn-dice-subtle" title="Mezclar aleatoriamente los colores en la torre">🔀 Desordenar colores</button><button type="button" id="rollVirtualDiceBtn" class="btn-dice-subtle">🎲 Tirar dado 3D</button>
             </div>
             <div class="dice-color-grid" id="diceColorButtons">
               <button type="button" class="dice-color-btn" data-color="0" style="background:#f8a5c2;color:#5e1a2b" title="Rosa pastel">🌸 Rosa</button>
@@ -68,6 +68,10 @@
       <div id="gameMenuRoom"></div>
       <div class="game-stats"><span id="towerTurns">0 piezas retiradas</span><span id="challengeCount">0 de 30 preguntas exploradas</span></div>
       <button id="rebuildTower" type="button" class="btn outline">Reconstruir y abrir nueva ronda</button>
+      <div style="display:flex;gap:8px;margin:10px 0">
+        <button id="menuShuffleBtn" type="button" class="btn outline" style="flex:1;font-size:13px">🔀 Desordenar colores</button>
+        <button id="menuRegularBtn" type="button" class="btn outline" style="flex:1;font-size:13px">🔁 Ordenar por niveles</button>
+      </div>
       <details class="tower-guide"><summary>Cómo jugar con el Jenga gigante</summary>
         <ol>
           <li>Lanza el dado gigante físico en el salón.</li>

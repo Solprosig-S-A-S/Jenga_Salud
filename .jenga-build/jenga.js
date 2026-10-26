@@ -18,6 +18,36 @@ const JENGA_COLORS = [
 ];
 window.JENGA_COLORS = JENGA_COLORS;
 
+// Color distribution management: allows scrambling/shuffling with 100% exact precision
+function generateColorMap(mode='shuffled'){
+  const arr=[];
+  if(mode==='regular'){
+    for(let i=0;i<54;i++)arr.push(i%JENGA_COLORS.length);
+  }else{
+    // Exactly 9 blocks of each of the 6 colors = 54 blocks
+    for(let c=0;c<6;c++)for(let k=0;k<9;k++)arr.push(c);
+    for(let i=arr.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;
+    }
+  }
+  return arr;
+}
+
+let currentBlockColors=[];
+try{
+  const saved=localStorage.getItem('jenga-colors-map-v1');
+  if(saved){
+    const parsed=JSON.parse(saved);
+    if(Array.isArray(parsed)&&parsed.length===54)currentBlockColors=parsed;
+  }
+}catch{}
+if(!currentBlockColors.length)currentBlockColors=generateColorMap('shuffled');
+
+function saveColorMap(){
+  try{localStorage.setItem('jenga-colors-map-v1',JSON.stringify(currentBlockColors));}catch{}
+}
+
 // 3D Giant Dice state
 let diceMesh = null, diceRolling = false, diceRollTime = 0, diceRollDuration = 1.8;
 let diceStartPos = null, diceTargetPos = null, diceTargetQuat = null, diceSpinAxis = null, diceOnComplete = null;
@@ -98,7 +128,7 @@ function select(b){
    cameraCue={from:azimuth,to:azimuth+angle,t:0};
  }
  selected=b;$('blockPicker').value=String(b.id);
- window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id}}));
+ window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id:b.id,color:b.color}}));
  $('pieceInstruction').textContent='Bloque ' + b.color.name;
  $('pieceDetail').textContent='Nivel ' + (b.level+1) + ' · posición ' + (b.slot===0?'lateral':b.slot===1?'centro':'lateral') + ' (3 en fila)';
  status('Bloque ' + b.color.name + ' retirado. La torre se ordena arriba. Responde la pregunta para pasar el turno.');
@@ -284,9 +314,8 @@ function animateCamera(dt,time){
 }
 
 // Blocks without visual numbers: clean, realistic pastel foam/fabric cushion blocks!
-function texture(id,end=false){
+function texture(color,end=false){
  const c=document.createElement('canvas');c.width=end?160:384;c.height=128;const ctx=c.getContext('2d');
- const color=JENGA_COLORS[(id-1)%JENGA_COLORS.length];
  ctx.fillStyle=color.hex;ctx.fillRect(0,0,c.width,128);
  const grad=ctx.createLinearGradient(0,0,0,128);
  grad.addColorStop(0,'rgba(255,255,255,0.42)');grad.addColorStop(0.18,'rgba(255,255,255,0.12)');grad.addColorStop(0.82,'rgba(0,0,0,0.02)');grad.addColorStop(1,'rgba(0,0,0,0.18)');
@@ -347,12 +376,12 @@ function reset(){
  if(diceMesh){diceRolling=false;diceOnComplete=null;diceMesh.position.copy(DICE_REST_POS);diceMesh.quaternion.setFromEuler(new THREE.Euler(0.2,0.4,0));}
  for(let level=0;level<18;level++)for(let slot=0;slot<3;slot++){
    const id=level*3+slot+1,pos=(slot-1)*(W+GAP),y=H/2+level*STEP;
-   const colorIndex=(id-1)%JENGA_COLORS.length;
+   const colorIndex=currentBlockColors[id-1]%JENGA_COLORS.length;
    const color=JENGA_COLORS[colorIndex];
    const body=new CANNON.Body({mass:.3,material:wood,shape:new CANNON.Box(new CANNON.Vec3(L/2,H/2,W/2)),linearDamping:.18,angularDamping:.35,sleepSpeedLimit:.06,sleepTimeLimit:1});
    body.position.set(level%2?pos:0,y,level%2?0:pos);body.quaternion.setFromEuler(0,level%2?Math.PI/2:0,0);world.addBody(body);
-   const longMat=new THREE.MeshStandardMaterial({map:texture(id),roughness:.55,color:0xffffff});
-   const endMat=new THREE.MeshStandardMaterial({map:texture(id,true),roughness:.62,color:0xffffff});
+   const longMat=new THREE.MeshStandardMaterial({map:texture(color),roughness:.55,color:0xffffff});
+   const endMat=new THREE.MeshStandardMaterial({map:texture(color,true),roughness:.62,color:0xffffff});
    const mesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),[endMat,endMat,longMat,longMat,longMat,longMat]);
    mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);
    const b={id,level,slot,body,mesh,homeY:y,color,colorIndex};mesh.userData.block=b;blocks.push(b);
@@ -361,6 +390,44 @@ function reset(){
  $('pieceDetail').textContent='Elige directamente en la torre 3D el bloque que vas a sacar.';
  $('towerTurns').textContent='0 bloques retirados';
  status('Torre lista. Marca qué color cayó en el dado físico o toca el bloque que sacaron.');options();controls();
+}
+
+function shuffleTowerColors(){
+  currentBlockColors=generateColorMap('shuffled');
+  saveColorMap();
+  blocks.forEach(b=>{
+    const cIndex=currentBlockColors[b.id-1]%JENGA_COLORS.length;
+    b.colorIndex=cIndex;
+    b.color=JENGA_COLORS[cIndex];
+    b.mesh.material.forEach((m,idx)=>{
+      const isEnd=(idx===0||idx===1);
+      m.map.dispose();
+      m.map=texture(b.color,isEnd);
+      m.needsUpdate=true;
+    });
+  });
+  options();
+  if(suggestedColor!==null)updateColorChips(suggestedColor);
+  status('Colores desordenados aleatoriamente. Los 6 colores están mezclados en la torre.');
+}
+
+function resetTowerColorsRegular(){
+  currentBlockColors=generateColorMap('regular');
+  saveColorMap();
+  blocks.forEach(b=>{
+    const cIndex=currentBlockColors[b.id-1]%JENGA_COLORS.length;
+    b.colorIndex=cIndex;
+    b.color=JENGA_COLORS[cIndex];
+    b.mesh.material.forEach((m,idx)=>{
+      const isEnd=(idx===0||idx===1);
+      m.map.dispose();
+      m.map=texture(b.color,isEnd);
+      m.needsUpdate=true;
+    });
+  });
+  options();
+  if(suggestedColor!==null)updateColorChips(suggestedColor);
+  status('Colores ordenados por niveles alternados.');
 }
 
 function extract(){
@@ -399,9 +466,9 @@ function update(dt){
    b.body.velocity.copy(dir.scale(1.85));
    const offset=b.body.position.vsub(origin).dot(dir);
    if(offset>3.35){b.body.type=CANNON.Body.KINEMATIC;b.body.updateMassProperties();b.body.velocity.setZero();b.body.angularVelocity.setZero();phase='lifting';elapsed=0;motion.liftStart=b.body.position.clone();}
-   else if(elapsed>12){b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.updateMassProperties();b.body.velocity.setZero();phase='ready';motion=null;status('Prueba otro bloque o vuelve a intentarlo.');controls();}
+   else if(elapsed>4){b.body.material=wood;b.body.type=CANNON.Body.DYNAMIC;b.body.updateMassProperties();b.body.velocity.setZero();phase='ready';motion=null;status('Prueba otro bloque o vuelve a intentarlo.');controls();}
  }else if(phase==='lifting'){
-   const b=motion.b,t=Math.min(elapsed/0.65,1),rise=Math.min(t/.65,1),slide=Math.max(0,(t-.45)/.55),s=slide*slide*(3-2*slide),y=Math.max(...blocks.filter(x=>x!==b).map(x=>x.body.position.y))+1.3;
+   const b=motion.b,t=Math.min(elapsed/0.65,1),rise=Math.min(t/.55,1),slide=Math.max(0,(t-.45)/.55),s=slide*slide*(3-2*slide),y=Math.max(...blocks.filter(x=>x!==b).map(x=>x.body.position.y))+1.2;
    b.body.position.set(motion.liftStart.x*(1-s),motion.liftStart.y+(y-motion.liftStart.y)*rise,motion.liftStart.z*(1-s));b.body.aabbNeedsUpdate=true;
    if(t===1)place();
  }
@@ -446,6 +513,18 @@ function frame(time){
 $('drawBlock').addEventListener('click',()=>rollAndPrompt());
 const rollVirtualBtn = $('rollVirtualDiceBtn');
 if(rollVirtualBtn) rollVirtualBtn.addEventListener('click',()=>rollAndPrompt());
+
+const shuffleTowerBtn = $('shuffleTowerBtn');
+if(shuffleTowerBtn) shuffleTowerBtn.addEventListener('click',shuffleTowerColors);
+
+const shuffleColorsBtn = $('shuffleColorsBtn');
+if(shuffleColorsBtn) shuffleColorsBtn.addEventListener('click',shuffleTowerColors);
+
+const menuShuffleBtn = $('menuShuffleBtn');
+if(menuShuffleBtn) menuShuffleBtn.addEventListener('click',shuffleTowerColors);
+
+const menuRegularBtn = $('menuRegularBtn');
+if(menuRegularBtn) menuRegularBtn.addEventListener('click',resetTowerColorsRegular);
 
 document.querySelectorAll('.dice-color-btn').forEach(btn=>{
  btn.addEventListener('click',e=>{
