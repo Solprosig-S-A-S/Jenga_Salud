@@ -42,3 +42,12 @@
 .btn-shuffle:hover{background:#e7f3ec;border-color:#087c78;transform:scale(1.03)}
 .btn-shuffle:active{transform:scale(.97)}
 .tower-controls .btn-shuffle{min-width:38px;min-height:38px;font-size:11px}
+
+.options-label{display:block;font-size:12px;font-weight:900;color:#184a3c;margin:6px 0 8px}
+.question-options{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.option-btn{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:2px solid #c8ded1;border-radius:12px;background:#fff;color:#1d4337;font:inherit;font-size:13px;line-height:1.35;font-weight:700;text-align:left;cursor:pointer;transition:border-color .15s,background .15s,transform .12s}
+.option-btn:hover{border-color:#087c78;background:#f3faf6;transform:translateX(3px)}
+.option-btn.is-selected{border-color:#087c78;background:#e5f6ee;box-shadow:0 0 0 1px #087c78, 0 3px 8px rgba(8,124,120,.18)}
+.option-letter{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#e0ede6;color:#125243;font-weight:900;font-size:12px;flex-shrink:0}
+.option-btn.is-selected .option-letter{background:#087c78;color:#fff}
+.option-text{flex:1}

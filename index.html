@@ -61,6 +61,15 @@
 .btn-shuffle:active{transform:scale(.97)}
 .tower-controls .btn-shuffle{min-width:38px;min-height:38px;font-size:11px}
 
+.options-label{display:block;font-size:12px;font-weight:900;color:#184a3c;margin:6px 0 8px}
+.question-options{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.option-btn{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:2px solid #c8ded1;border-radius:12px;background:#fff;color:#1d4337;font:inherit;font-size:13px;line-height:1.35;font-weight:700;text-align:left;cursor:pointer;transition:border-color .15s,background .15s,transform .12s}
+.option-btn:hover{border-color:#087c78;background:#f3faf6;transform:translateX(3px)}
+.option-btn.is-selected{border-color:#087c78;background:#e5f6ee;box-shadow:0 0 0 1px #087c78, 0 3px 8px rgba(8,124,120,.18)}
+.option-letter{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#e0ede6;color:#125243;font-weight:900;font-size:12px;flex-shrink:0}
+.option-btn.is-selected .option-letter{background:#087c78;color:#fff}
+.option-text{flex:1}
+
 </style>
 </head>
 <body>
@@ -209,7 +218,11 @@
           <div class="turn-progress" aria-label="Pasos del turno"><span data-turn-step="choose">1 · Elige</span><span data-turn-step="answer">2 · Responde</span><span data-turn-step="move">3 · Mueve</span></div>
           <div class="question-meta"><span id="challengeType" class="pill">Una pieza, una pregunta</span><span id="pieceInstruction">¿Qué pieza saldrá?</span></div>
           <h2 id="challengeQuestion" class="challenge-title" aria-live="polite">Sortea una pieza para descubrir tu reto.</h2>
-          <div id="responseArea" class="response-area" hidden><label for="playerResponse">Tu respuesta</label><textarea id="playerResponse" rows="2" maxlength="500" required placeholder="Escribe tu respuesta para guardarla…"></textarea></div>
+          <div id="responseArea" class="response-area" hidden>
+            <label class="options-label">Selecciona tu respuesta:</label>
+            <div id="questionOptions" class="question-options"></div>
+            <textarea id="playerResponse" rows="2" maxlength="500" required style="position:absolute;opacity:0;pointer-events:none;height:0;margin:0"></textarea>
+          </div>
           <p id="answerSaveStatus" class="fine" role="status" aria-live="polite">Las respuestas se guardan con tu alias. Evita incluir datos personales.</p>
           <p id="responseEcho" class="response-echo" hidden></p>
           <div class="reveal" id="challengeAnswer" role="status"></div>
@@ -13527,36 +13540,36 @@ function evaluate(){
 }
 
 const challenges=[
- ['Verdadero o falso','La presión arterial elevada siempre produce síntomas.','Falso. Puede no presentar síntomas; por eso es importante medirla.','PRESIÓN'],
- ['Completa','El IMC relaciona el peso con la ______.','Estatura al cuadrado (en metros).','INDICADORES'],
- ['Pregunta','¿Qué significan las letras IMC?','Índice de masa corporal.','INDICADORES'],
- ['Verdadero o falso','El exceso de alcohol puede elevar la presión arterial.','Verdadero. Reducir o evitar su consumo es una medida protectora.','ALCOHOL'],
- ['Reto grupal','Nombren tres formas de moverse durante la jornada laboral.','Caminar, hacer pausas de movilidad y usar escaleras si resulta seguro.','MOVIMIENTO'],
- ['Pregunta','¿Por qué es útil conocer el perímetro abdominal?','Es un indicador complementario que debe interpretarse junto con otros datos.','CINTURA'],
- ['Completa','El número de arriba en la presión arterial se llama ______.','Presión sistólica.','PRESIÓN'],
- ['Completa','El número de abajo en la presión arterial se llama ______.','Presión diastólica.','PRESIÓN'],
- ['Mito o realidad','Un IMC habitual significa que ya no necesito controles de salud.','Mito. El IMC no evalúa por sí solo la salud cardiovascular.','INDICADORES'],
- ['Reto creativo','Inventa un lema que incluya la palabra “corazón”.','Respuesta libre: que anime al autocuidado sin juzgar a otras personas.','CREATIVIDAD'],
- ['Reto grupal','Digan cuatro alimentos que aporten fibra.','Avena, lentejas, fríjoles, frutas y verduras, entre otros.','ALIMENTACIÓN'],
- ['Pregunta','¿Cuántos minutos semanales de actividad moderada se recomiendan para adultos?','Al menos 150 minutos a la semana, adaptados a la capacidad personal.','MOVIMIENTO'],
- ['Verdadero o falso','Estar sentado muchas horas sin pausas no importa si hago ejercicio un día a la semana.','Falso. Conviene reducir el tiempo sedentario y moverse a lo largo del día.','MOVIMIENTO'],
- ['Reto de mímica','Representa sin palabras una pausa activa que harías en la oficina.','El grupo adivina; evita esfuerzos que generen dolor.','MOVIMIENTO'],
- ['Pregunta','¿Qué bebida conviene elegir con mayor frecuencia para hidratarnos?','Agua potable.','ALIMENTACIÓN'],
- ['Mito o realidad','El sueño también hace parte del cuidado cardiovascular.','Realidad. Un descanso regular es un hábito protector.','DESCANSO'],
- ['Verdadero o falso','Puedo saber si tengo hipertensión solo con mi peso.','Falso. Se necesita medir la presión y una evaluación profesional.','PRESIÓN'],
- ['Reto grupal','Mencionen tres alternativas para compartir sin tomar alcohol.','Bebidas sin alcohol, baile, concursos, juegos y actividades deportivas adaptadas.','ALCOHOL'],
- ['Completa','Una forma de disminuir azúcar en bebidas es elegir más ______.','Agua.','ALIMENTACIÓN'],
- ['Pregunta','¿Qué harías si tienes una presión muy alta en una medición?','Repetir después de al menos un minuto en reposo y buscar consejo profesional inmediato si persiste; con signos de alarma, urgencias.','PRESIÓN'],
- ['Mito o realidad','Caminar, bailar o montar bicicleta pueden contar como actividad física.','Realidad, según su duración e intensidad.','MOVIMIENTO'],
- ['Reto creativo','Inventa una frase corta para motivar a beber más agua.','Respuesta libre.','CREATIVIDAD'],
- ['Pregunta','¿Por qué una sola medición de presión no confirma hipertensión?','Porque la presión cambia por diferentes causas y requiere evaluación con mediciones apropiadas.','PRESIÓN'],
- ['Reto grupal','Propongan tres hábitos que apoyen la salud metabólica.','Moverse, alimentarse variadamente, descansar, evitar tabaco y acudir a controles.','AUTOCUIDADO'],
- ['Verdadero o falso','Fumar solo ocasionalmente no afecta la salud del corazón.','Falso. El tabaco aumenta el riesgo cardiovascular.','AUTOCUIDADO'],
- ['Pregunta','¿Quién debe interpretar IMC, perímetro abdominal y presión en conjunto?','Un profesional de salud que conozca tu contexto clínico.','INDICADORES'],
- ['Reto creativo','En 15 segundos, inventa una campaña para cambiar una gaseosa por agua.','Respuesta libre, creativa y respetuosa.','CREATIVIDAD'],
- ['Verdadero o falso','Reducir el consumo excesivo de sal puede apoyar el control de la presión.','Verdadero.','ALIMENTACIÓN'],
- ['Reto grupal','La torre se mueve: mencionen tres cambios saludables fáciles de sostener.','Caminar en pausas, planear refrigerios, dormir con regularidad, beber agua.','AUTOCUIDADO'],
- ['Pregunta final','¿Qué significa cuidar tu salud “bloque a bloque”?','Tomar decisiones cotidianas, revisar nuestros hábitos y pedir orientación cuando haga falta.','AUTOCUIDADO']
+ ['Verdadero o falso','¿La presión arterial elevada siempre produce síntomas notables?','Falso. Suele ser silenciosa y muchas veces no produce ningún síntoma; por eso es vital medirla periódicamente.','PRESIÓN',['A) Falso, casi nunca da síntomas y se debe medir periódicamente','B) Verdadero, siempre causa un dolor de cabeza fuerte','C) Verdadero, solo da síntomas cuando se duerme'],0],
+ ['Selección','¿Con qué relaciona el peso corporal la fórmula del IMC?','La estatura al cuadrado en metros (peso / estatura²).','INDICADORES',['A) Con la edad y género de la persona','B) Con la estatura al cuadrado (en metros)','C) Con la cantidad de agua consumida al día'],1],
+ ['Selección','¿Qué significan las siglas IMC?','Índice de Masa Corporal.','INDICADORES',['A) Índice de Masa Corporal','B) Indicador Médico Cardiovascular','C) Intervalo de Movimiento Cotidiano'],0],
+ ['Verdadero o falso','¿El consumo excesivo de alcohol puede elevar la presión arterial?','Verdadero. El alcohol en exceso eleva la presión arterial; moderar o evitar su consumo protege el corazón.','ALCOHOL',['A) Verdadero, eleva la presión y el riesgo cardíaco','B) Falso, el alcohol baja la presión permanentemente','C) Falso, el alcohol no tiene ningún efecto en las arterias'],0],
+ ['Selección','Durante la jornada laboral, una forma sencilla de mantenerse activo es:','Realizar pausas activas, estirar suavemente y caminar unos minutos periódicamente.','MOVIMIENTO',['A) Hacer pausas activas, estirar o caminar unos minutos','B) Quedarse sentado 8 horas seguidas sin moverse','C) Tomar bebidas energéticas en vez de levantarse'],0],
+ ['Selección','¿Por qué es útil conocer la medida de la cintura (perímetro abdominal)?','Indica acumulación de grasa visceral en el abdomen, un factor clave de riesgo cardiovascular.','CINTURA',['A) Revela acumulación de grasa abdominal y riesgo cardiovascular','B) Solo sirve para saber la talla del pantalón','C) Únicamente se debe medir una vez en la vida'],0],
+ ['Selección','El número superior o "de arriba" en la presión arterial se llama:','Presión sistólica (la fuerza cuando el corazón late).','PRESIÓN',['A) Presión sistólica','B) Presión diastólica','C) Frecuencia respiratoria'],0],
+ ['Selección','El número inferior o "de abajo" en la presión arterial se llama:','Presión diastólica (la presión entre latidos cuando el corazón reposa).','PRESIÓN',['A) Presión sistólica','B) Presión diastólica','C) Pulso cardíaco basal'],1],
+ ['Mito o realidad','¿Tener un IMC en rango normal significa que ya no necesito controles de salud?','Mito. El IMC es solo una referencia; la salud también depende de la presión, glucosa y hábitos diarios.','INDICADORES',['A) Realidad, con un buen IMC ya no hay ningún riesgo','B) Mito, aún se debe vigilar la presión, lípidos y chequeos regulares','C) Realidad, el peso es el único dato que importa'],1],
+ ['Selección','¿Cuál de estos hábitos protege y fortalece directamente la salud de tu corazón?','Hacer actividad física regular, descansar bien y llevar una alimentación variada.','AUTOCUIDADO',['A) Realizar actividad física regular y dormir suficiente','B) Fumar para calmar la ansiedad diaria','C) Consumir exceso de sal y fritos en cada comida'],0],
+ ['Selección','¿Cuáles de estos alimentos son excelentes fuentes de fibra natural?','Avena, legumbres (lentejas, frijoles), frutas y verduras.','ALIMENTACIÓN',['A) Avena, lentejas, frijoles, frutas y verduras','B) Gaseosas, dulces y pan blanco ultraprocesado','C) Aceites recalentados y mantequilla'],0],
+ ['Selección','¿Cuántos minutos semanales de actividad moderada recomienda la OMS en adultos?','Al menos 150 a 300 minutos a la semana (ej. 30 minutos al día 5 días por semana).','MOVIMIENTO',['A) Al menos 150 minutos a la semana (ej. 30 min por 5 días)','B) Solamente 10 minutos al mes','C) Mínimo 10 horas seguidas al día sin descansar'],0],
+ ['Verdadero o falso','¿Estar sentado muchas horas sin pausas no afecta si entreno solo un día a la semana?','Falso. El sedentarismo prolongado diario daña la circulación; conviene levantarse y moverse varias veces al día.','MOVIMIENTO',['A) Falso, el sedentarismo diario prolongado afecta la circulación','B) Verdadero, entrenar el domingo compensa todo el sedentarismo','C) Verdadero, estar sentado todo el día no tiene consecuencias'],0],
+ ['Selección','En el puesto de trabajo, una pausa activa segura y recomendada consiste en:','Movilizar suavemente hombros, cuello, muñecas y estirar las piernas.','MOVIMIENTO',['A) Movilizar suavemente hombros, cuello, muñecas y piernas','B) Levantar objetos muy pesados sin calentar','C) Quedarse inmóvil frente a la pantalla'],0],
+ ['Selección','¿Cuál es la bebida ideal para mantener una hidratación diaria saludable?','Agua potable.','ALIMENTACIÓN',['A) Agua potable','B) Gaseosas y refrescos azucarados','C) Bebidas energizantes con cafeína'],0],
+ ['Mito o realidad','¿El descanso regular y dormir entre 7 y 8 horas diarias cuida tu corazón?','Realidad. Dormir bien ayuda a regular la presión arterial y disminuye el estrés cardiovascular.','DESCANSO',['A) Realidad, el descanso regular protege el corazón y la presión','B) Mito, el sueño no tiene relación con el sistema circulatorio','C) Mito, solo es importante para los niños'],0],
+ ['Verdadero o falso','¿Se puede saber con certeza si una persona tiene hipertensión solo mirando su peso?','Falso. Personas de cualquier contextura pueden tener hipertensión; se requiere medición con tensiómetro.','PRESIÓN',['A) Falso, se necesita medir la presión con tensiómetro','B) Verdadero, solo las personas con mucho peso tienen presión alta','C) Verdadero, se puede notar a simple vista en el rostro'],0],
+ ['Selección','En celebraciones del trabajo o reuniones, una alternativa saludable y divertida es:','Ofrecer bebidas sin alcohol, jugos naturales, música y dinámicas grupales.','AUTOCUIDADO',['A) Disfrutar de bebidas sin alcohol, música y dinámicas grupales','B) Obligar a tomar alcohol para poder compartir','C) No tomar ningún líquido durante la reunión'],0],
+ ['Selección','Para reducir el exceso de azúcar en el día a día, una excelente estrategia es:','Reemplazar bebidas azucaradas y jugos artificiales por agua o infusiones sin azúcar.','ALIMENTACIÓN',['A) Reemplazar gaseosas y jugos artificiales por agua potable','B) Agregar el doble de azúcar a las bebidas calientes','C) Consumir postres ultraprocesados en cada comida'],0],
+ ['Selección','Si en una medición ocasional tu presión sale muy alta, lo indicado es:','Repetir la toma tras 5 minutos de reposo sentado y consultar a un profesional de la salud.','PRESIÓN',['A) Repetir la toma en reposo tras unos minutos y consultar al médico','B) Asustarse y no volver a medirse nunca más','C) Salir a trotar intensamente de inmediato'],0],
+ ['Mito o realidad','¿Caminar a paso ligero, bailar o subir escaleras cuentan como actividad física?','Realidad. Cualquier movimiento que eleve el ritmo cardíaco suma minutos saludables al día.','MOVIMIENTO',['A) Realidad, todo movimiento cotidiano suma minutos de salud','B) Mito, solo cuenta si se asiste a un gimnasio costoso','C) Mito, caminar no aporta ningún beneficio al corazón'],0],
+ ['Selección','Una estrategia práctica para recordar tomar agua durante la jornada de trabajo es:','Tener un termo de agua visible en el escritorio y beber a sorbos regulares.','ALIMENTACIÓN',['A) Mantener un termo de agua visible en el escritorio','B) Esperar a tener la boca seca para buscar agua','C) Reemplazar el agua por gaseosas'],0],
+ ['Selección','¿Por qué una sola toma no es suficiente para confirmar hipertensión?','Porque la presión varía por estrés, esfuerzo, cafeína o dolor en ese instante.','PRESIÓN',['A) Porque la presión fluctúa por estrés, esfuerzo o dolor momentáneo','B) Porque los tensiómetros solo funcionan en la noche','C) Porque la presión arterial nunca cambia a lo largo de la vida'],0],
+ ['Selección','¿Cuáles son tres pilares esenciales para una buena salud metabólica?','Moverse a diario, alimentación variada y suficiente descanso nocturno.','AUTOCUIDADO',['A) Movimiento diario, alimentación variada y buen descanso','B) Fumar, saltarse comidas y no dormir','C) Quedarse quieto y evitar las verduras'],0],
+ ['Verdadero o falso','¿Fumar o vapear solo ocasionalmente no genera daño en las arterias?','Falso. El tabaco y el vapor con nicotina dañan los vasos sanguíneos desde los primeros consumos.','AUTOCUIDADO',['A) Falso, incluso el consumo ocasional lesiona las arterias','B) Verdadero, el cuerpo elimina todo el humo en 5 minutos','C) Verdadero, el tabaco nunca afecta el corazón'],0],
+ ['Selección','¿Quién es la persona idónea para interpretar tus indicadores de salud en conjunto?','Un profesional de la salud o médico calificado en consulta.','INDICADORES',['A) Un profesional de la salud calificado en consulta','B) Un video anónimo sin fuentes en redes sociales','C) Un horóscopo o prueba de internet'],0],
+ ['Selección','¿Qué beneficio aporta cambiar bebidas azucaradas por agua potable?','Reduce calorías vacías, protege los dientes y apoya el control del peso y la glucosa.','ALIMENTACIÓN',['A) Reduce sobrecarga de azúcar, cuida el peso y los dientes','B) Hace que el cuerpo pierda hidratación','C) Ninguno, el azúcar en exceso no tiene consecuencias'],0],
+ ['Verdadero o falso','¿Reducir el exceso de sal en las comidas apoya el control de la presión arterial?','Verdadero. Menos sodio favorece que las arterias mantengan una presión adecuada.','ALIMENTACIÓN',['A) Verdadero, menos sodio previene el aumento de la presión','B) Falso, la sal no tiene ninguna relación con la presión','C) Falso, se debe añadir sal extra a todos los alimentos'],0],
+ ['Selección','¿Cuál de estos pequeños cambios es fácil de mantener en el tiempo?','Caminar 10 a 15 minutos en las pausas y comer una fruta al día.','AUTOCUIDADO',['A) Caminar 10-15 minutos diarios y sumar una fruta al día','B) Dejar de comer por varios días seguidos','C) Eliminar el descanso de los fines de semana'],0],
+ ['Selección','¿Qué significa cuidar tu salud "bloque a bloque"?','Que cada pequeña decisión cotidiana (moverse, hidratarse, chequearse) construye tu bienestar.','AUTOCUIDADO',['A) Que las pequeñas decisiones cotidianas construyen tu bienestar','B) Que solo debemos cuidarnos cuando ya estamos enfermos','C) Que la salud depende únicamente de la suerte o el azar'],0]
 ];
 let remaining=challenges.map((_,i)=>i),current=null,visited=0;
 let currentPiece=null;
@@ -13572,10 +13585,37 @@ function setBlockChallenge(detail){
   el('challengeType').textContent=current[0]+(color?' · '+color.name:'');
   el('challengeQuestion').textContent=current[1];
   el('challengeAnswer').textContent='Respuesta o guía: '+current[2];
-  if(changed){el('challengeAnswer').classList.remove('visible');el('seeAnswer').textContent='👀 Ver respuesta';}
+  if(changed){
+    el('challengeAnswer').classList.remove('visible');
+    el('seeAnswer').textContent='👀 Ver guía';
+    const input=el('playerResponse');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}
+  }
   el('seeAnswer').disabled=!window.JengaSession?.can('reveal');
   if(detail.completed)exploredQuestions.add(index);
   el('challengeCount').textContent=exploredQuestions.size+' de 30 preguntas exploradas con piezas retiradas';
+
+  // Multiple-choice options rendering
+  const optsContainer=el('questionOptions');
+  if(optsContainer&&current[4]){
+    optsContainer.replaceChildren();
+    current[4].forEach((optText)=>{
+      const btn=document.createElement('button');
+      btn.type='button';btn.className='option-btn';
+      const letter=optText.slice(0,1);
+      const text=optText.slice(3);
+      btn.innerHTML='<span class="option-letter">'+letter+'</span><span class="option-text">'+text+'</span>';
+      btn.addEventListener('click',()=>{
+        optsContainer.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        const input=el('playerResponse');
+        if(input){
+          input.value=optText;
+          input.dispatchEvent(new Event('input',{bubbles:true}));
+        }
+      });
+      optsContainer.appendChild(btn);
+    });
+  }
 }
 function resetBlockChallenge(){
   current=null;currentPiece=null;exploredQuestions.clear();
@@ -13736,7 +13776,7 @@ async function act(action,payload={}){
   if(!can(action))return false;
   if(action==='answer'){
     payload=window.JengaAnswers.payload();
-    if(!payload.response||payload.response.length>500){error('Escribe tu respuesta antes de guardarla (máximo 500 caracteres).');$('playerResponse').focus();return false;}
+    if(!payload.response||payload.response.length>500){error('Selecciona tu respuesta antes de guardarla (máximo 500 caracteres).');$('playerResponse').focus();return false;}
   }
   busy=true;error('');render();
   try{

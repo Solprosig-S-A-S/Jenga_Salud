@@ -77,10 +77,37 @@ function setBlockChallenge(detail){
   el('challengeType').textContent=current[0]+(color?' · '+color.name:'');
   el('challengeQuestion').textContent=current[1];
   el('challengeAnswer').textContent='Respuesta o guía: '+current[2];
-  if(changed){el('challengeAnswer').classList.remove('visible');el('seeAnswer').textContent='👀 Ver respuesta';}
+  if(changed){
+    el('challengeAnswer').classList.remove('visible');
+    el('seeAnswer').textContent='👀 Ver guía';
+    const input=el('playerResponse');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}
+  }
   el('seeAnswer').disabled=false;
   if(detail.completed)exploredQuestions.add(index);
   el('challengeCount').textContent=exploredQuestions.size+' de 30 preguntas exploradas con piezas retiradas';
+
+  // Multiple-choice options rendering
+  const optsContainer=el('questionOptions');
+  if(optsContainer&&current[4]){
+    optsContainer.replaceChildren();
+    current[4].forEach((optText)=>{
+      const btn=document.createElement('button');
+      btn.type='button';btn.className='option-btn';
+      const letter=optText.slice(0,1);
+      const text=optText.slice(3);
+      btn.innerHTML='<span class="option-letter">'+letter+'</span><span class="option-text">'+text+'</span>';
+      btn.addEventListener('click',()=>{
+        optsContainer.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        const input=el('playerResponse');
+        if(input){
+          input.value=optText;
+          input.dispatchEvent(new Event('input',{bubbles:true}));
+        }
+      });
+      optsContainer.appendChild(btn);
+    });
+  }
 }
 function resetBlockChallenge(){
   current=null;currentPiece=null;exploredQuestions.clear();
