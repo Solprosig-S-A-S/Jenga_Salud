@@ -17,6 +17,14 @@ const JENGA_COLORS = [
   { id: 'amarillo', name: 'Amarillo pastel', hex: '#ffeaa7', text: '#544310', emissive: 0xffeaa7 }
 ];
 window.JENGA_COLORS = JENGA_COLORS;
+window.getJengaBlockColor = function(id){
+  const b = blocks.find(x => x.id === id);
+  if(b) return b.color;
+  if(currentBlockColors && currentBlockColors[id-1] !== undefined){
+    return JENGA_COLORS[currentBlockColors[id-1] % JENGA_COLORS.length];
+  }
+  return JENGA_COLORS[(id - 1) % JENGA_COLORS.length];
+};
 
 // Color distribution management: allows scrambling/shuffling with 100% exact precision
 function generateColorMap(mode='shuffled'){
@@ -278,7 +286,12 @@ function roomUpdate(next,previous){
    added.forEach(id=>window.dispatchEvent(new CustomEvent('jenga-challenge',{detail:{id,completed:true}})));
    // If the block is already at the top or being animated, update canonical
    if(added.length===1&&phase==='ready'&&!fallen&&(!selected||selected.id!==added[0])){
-     selected=blocks.find(b=>b.id===added[0]);pendingCanonical=moves;extract();
+     const b=blocks.find(b=>b.id===added[0]);
+     if(b&&b.level<18){
+       selected=b;pendingCanonical=moves;extract();
+     }else{
+       canonical(moves);
+     }
    }else canonical(moves);
  }
  if(next.status==='lobby'&&previous?.status!=='lobby'){window.dispatchEvent(new Event('jenga-board-reset'));canonical([]);}

@@ -71,7 +71,7 @@ function setBlockChallenge(detail){
   const index=(detail.id-1)%challenges.length;
   const changed=currentPiece!==detail.id;
   currentPiece=detail.id;current=challenges[index];
-  const color=detail.color||(window.JENGA_COLORS||[])[(detail.id-1)%6];
+  const color=detail.color||(window.getJengaBlockColor&&window.getJengaBlockColor(detail.id))||(window.JENGA_COLORS||[])[(detail.id-1)%6];
   const colorHtml=color?'<span class="color-badge" style="background:'+color.hex+';color:'+color.text+'">'+color.name.toUpperCase()+'</span> · ':'';
   el('blockLabel').innerHTML=colorHtml+current[3];
   el('challengeType').textContent=current[0]+(color?' · '+color.name:'');

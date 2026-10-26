@@ -91,7 +91,7 @@ async function act(action,payload={}){
   if(!can(action))return false;
   if(action==='answer'){
     payload=window.JengaAnswers.payload();
-    if(!payload.response||payload.response.length>500){error('Selecciona tu respuesta antes de guardarla (máximo 500 caracteres).');$('playerResponse').focus();return false;}
+    if(!payload.response||payload.response.length>500){error('Selecciona tu respuesta antes de guardarla (máximo 500 caracteres).');(document.querySelector('.option-btn')||$('playerResponse'))?.focus();return false;}
   }
   busy=true;error('');render();
   try{
