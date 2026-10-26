@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id), host=$('towerView');
 let scene,camera,renderer,world,blocks=[],selected=null,phase='ready',motion=null,elapsed=0,turn=0,topSlots=0,fallen=false,started=false,last=0;
-let azimuth=.72,elevation=.24,radius=24,drag=null;
+let azimuth=.72,elevation=.24,radius=15.5,drag=null;
 let appliedMoves=[],roomCode=null,pendingCanonical=null;
 let cameraCue=null,cameraZoom=1,cameraTargetY=5.5,entranceTime=0;
 let suggestedColor=null;
@@ -539,6 +539,23 @@ $('confirmBlock').addEventListener('click',()=>{if(selected&&phase==='ready')ses
 $('rebuildTower').addEventListener('click',()=>session()?.act('reset'));
 $('rotateLeft').addEventListener('click',()=>{manualCamera();azimuth-=Math.PI/4;aim();});
 $('rotateRight').addEventListener('click',()=>{manualCamera();azimuth+=Math.PI/4;aim();});
+
+const zoomInBtn = $('zoomInBtn');
+if(zoomInBtn) zoomInBtn.addEventListener('click', () => {
+  manualCamera();
+  radius = Math.max(9, radius - 2);
+  const slider = $('zoomTower');
+  if(slider) slider.value = radius;
+  aim();
+});
+const zoomOutBtn = $('zoomOutBtn');
+if(zoomOutBtn) zoomOutBtn.addEventListener('click', () => {
+  manualCamera();
+  radius = Math.min(24, radius + 2);
+  const slider = $('zoomTower');
+  if(slider) slider.value = radius;
+  aim();
+});
 $('zoomTower').addEventListener('input',e=>{manualCamera();radius=Number(e.target.value);aim();});
 window.addEventListener('jenga-open',()=>{init();resize();});
 window.addEventListener('jenga-reset',()=>{

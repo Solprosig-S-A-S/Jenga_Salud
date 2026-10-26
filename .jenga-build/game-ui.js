@@ -53,7 +53,7 @@ function render(){
   effect($('blockLabel'),[{transform:'scale(.88)'},{transform:'scale(1.07)',offset:.65},{transform:'scale(1)'}],650);
  }
  lastPiece=state?.selectedId;
- const expanded=document.body.classList.contains('tower-expanded');$('expandTower').setAttribute('aria-expanded',String(expanded));$('expandTower').setAttribute('aria-label',expanded?'Volver a la pregunta':'Ampliar torre');$('expandTower').textContent=expanded?'⤡':'⤢';
+ const expanded=document.body.classList.contains('tower-expanded');$('expandTower').setAttribute('aria-expanded',String(expanded));$('expandTower').setAttribute('aria-label',expanded?'Reducir tamaño':'Agrandar torre');$('expandTower').textContent=expanded?'⤡ Reducir':'⤢ Agrandar';
 }
 $('openGameMenu').addEventListener('click',openMenu);$('openRoundMenu').addEventListener('click',openMenu);$('closeGameMenu').addEventListener('click',closeMenu);
 menu.addEventListener('click',event=>{if(event.target===menu){const r=menu.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeMenu();}});

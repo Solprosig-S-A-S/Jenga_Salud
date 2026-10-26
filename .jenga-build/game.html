@@ -5,14 +5,14 @@
       <div id="playArena" class="play-arena" data-step="choose" hidden>
         <div class="tower-stage">
           <div id="turnToast" class="turn-toast" aria-hidden="true" hidden></div>
-          <div class="tower-hud"><span id="blockLabel" class="tower-badge">Tu próximo bloque</span><button id="expandTower" type="button" aria-expanded="false" aria-label="Ampliar torre">⤢</button></div>
+          <div class="tower-hud"><span id="blockLabel" class="tower-badge">Tu próximo bloque</span><button id="expandTower" type="button" aria-expanded="false" aria-label="Agrandar torre">⤢ Agrandar</button></div>
           <div id="towerView" class="tower-view"></div>
           <div class="tower-controls" aria-label="Controles de la cámara">
             <button id="rotateLeft" type="button" aria-label="Girar vista a la izquierda">↶</button>
             <span id="pieceDetail" class="piece-location">Arrastra para girar</span>
             <button id="rotateRight" type="button" aria-label="Girar vista a la derecha">↷</button>
             <button id="shuffleColorsBtn" type="button" class="btn-shuffle" aria-label="Desordenar colores de la torre" title="Desordenar colores de la torre">🔀</button><button id="motionToggle" type="button" aria-pressed="true" aria-label="Pausar animaciones automáticas">⏸</button>
-            <label class="tower-zoom">Zoom <input id="zoomTower" type="range" min="17" max="34" value="24" aria-label="Distancia de la cámara"></label>
+            <button id="zoomInBtn" type="button" class="btn-zoom" aria-label="Agrandar torre" title="Agrandar torre (Zoom +)">🔍+</button><label class="tower-zoom">Tamaño <input id="zoomTower" type="range" min="9" max="24" value="15.5" step="0.5" aria-label="Tamaño del Jenga"></label><button id="zoomOutBtn" type="button" class="btn-zoom" aria-label="Alejar torre" title="Alejar torre (Zoom −)">🔍−</button>
           </div>
           <div id="towerStatus" class="tower-status" role="status" aria-live="polite">Preparando la torre…</div>
         </div>
